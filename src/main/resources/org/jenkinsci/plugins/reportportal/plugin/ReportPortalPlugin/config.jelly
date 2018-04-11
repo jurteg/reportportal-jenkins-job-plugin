@@ -1,0 +1,46 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+    <f:section title="Report Portal reporting for Jenkins job">
+        <f:entry title="Enable reporting">
+            <f:checkbox name="enableReporting" field="enableReporting" checked="${it.enableReporting}"/>
+        </f:entry>
+
+        <f:entry title="Jenkins job name to report" help="It should be unique Jenkins job name.">
+            <f:textbox name="jobName" value="${it.jobName}"/>
+        </f:entry>
+
+        <f:entry title="Report Portal launch name (optional)" help="Appropriate launch name will be displayed in Launches tab in RP.\n Please note: only launches with the same name will be processed by auto analysis">
+            <f:textbox name="launchName" value="${it.launchName}"/>
+        </f:entry>
+
+        <f:entry title="Report Portal launch description (optional)" help="This text will be displaying in launch description on Rp server.">
+            <f:textbox name="launchDescription" value="${it.launchDescription}"/>
+        </f:entry>
+
+        <f:entry title="Report Portal suite name (optional)" help="Appropriate suite name will be displayed inside RP launch. The root suite will not appear if leave this field blank.">
+            <f:textbox name="suiteName" value="${it.suiteName}"/>
+        </f:entry>
+
+        <f:entry title="Report Portal test name (optional)" help="The name for one single test under the root test suite.">
+            <f:textbox name="testName" value="${it.testName}"/>
+        </f:entry>
+
+        <f:entry title="Launch tags" help="Please type your list of tags separated by space.">
+            <f:textbox name="tags" value="${it.tags}"/>
+        </f:entry>
+
+
+        <f:entry title="RP endpoint" help="HTTP address of Report Portal server.">
+            <f:textbox name="rpEndpoint" value="${it.rpEndpoint}"/>
+        </f:entry>
+
+        <f:entry title="RP project" help="Existing Report portal project to store launches in there.">
+            <f:textbox name="rpProject" value="${it.rpProject}"/>
+        </f:entry>
+
+        <f:entry title="UUID" help="Unique user identifier.">
+            <f:textbox name="rpUuid" value="${it.rpUuid}"/>
+        </f:entry>
+
+    </f:section>
+</j:jelly>
