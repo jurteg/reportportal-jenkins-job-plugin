@@ -16,9 +16,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Extension
-public class ReportPortalPlugin extends Plugin {
+public class ReportPortalPluginInitial extends Plugin {
 
-    private final static java.util.logging.Logger LOGGER = Logger.getLogger(ReportPortalPlugin.class.getName());
+    private final static java.util.logging.Logger LOGGER = Logger.getLogger(ReportPortalPluginInitial.class.getName());
     private static final String SPACE = " ";
 
     private boolean enableReporting;

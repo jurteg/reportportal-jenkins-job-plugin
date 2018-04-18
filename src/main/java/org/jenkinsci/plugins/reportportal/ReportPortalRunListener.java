@@ -6,7 +6,7 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.reportportal.plugin.ReportPortalPlugin;
+import org.jenkinsci.plugins.reportportal.plugin.ReportPortalPluginInitial;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -20,12 +20,12 @@ public class ReportPortalRunListener extends RunListener<Run> {
     private final static int LOG_SIZE_LINES = 100000;
 
     private boolean isRunning = false;
-    private ReportPortalPlugin plugin;
+    private ReportPortalPluginInitial plugin;
     private LaunchReporter reporter;
 
     @Override
     public void onStarted(Run run, TaskListener listener) {
-        plugin = (ReportPortalPlugin) Jenkins.getInstance().getPluginManager().getPlugin(ReportPortalPlugin.class).getPlugin();
+        plugin = (ReportPortalPluginInitial) Jenkins.getInstance().getPluginManager().getPlugin(ReportPortalPluginInitial.class).getPlugin();
         if (plugin.isEnableReporting()) {
             if (plugin.getJobName().equals(run.getFullDisplayName().replace(run.getSearchName(), "").trim())) {
                 reporter = new LaunchReporter(plugin.getSettings());

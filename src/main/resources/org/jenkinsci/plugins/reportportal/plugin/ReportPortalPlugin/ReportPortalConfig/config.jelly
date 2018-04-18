@@ -1,0 +1,18 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+
+    <f:section title="">
+        <f:block>
+            <f:entry title="Report Portal Server Address" field="endpoint">
+                <f:textbox/>
+            </f:entry>
+            <f:entry title="Report Portal Project Name" field="project">
+                <f:textbox/>
+            </f:entry>
+            <f:entry title="Unique User Identifier (UUID)" field="uuid">
+                <f:textbox/>
+            </f:entry>
+        </f:block>
+    </f:section>
+
+</j:jelly>
