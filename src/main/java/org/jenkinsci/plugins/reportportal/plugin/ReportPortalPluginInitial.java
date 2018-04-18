@@ -4,7 +4,6 @@ import com.epam.reportportal.listeners.ListenerParameters;
 import com.epam.reportportal.utils.properties.PropertiesLoader;
 import hudson.Extension;
 import hudson.Plugin;
-import hudson.tasks.BuildStepDescriptor;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.reportportal.ReporterSettings;
