@@ -3,13 +3,13 @@
 
     <f:section title="">
         <f:block>
-            <f:entry title="Report Portal Server Address" field="endpoint">
+            <f:entry title="RP Server Address" field="endpoint">
                 <f:textbox/>
             </f:entry>
-            <f:entry title="Report Portal Project Name" field="project">
+            <f:entry title="RP Project Name" field="project">
                 <f:textbox/>
             </f:entry>
-            <f:entry title="Unique User Identifier (UUID)" field="uuid">
+            <f:entry title="UUID" field="uuid">
                 <f:textbox/>
             </f:entry>
         </f:block>
