@@ -1,9 +1,11 @@
-package org.jenkinsci.plugins.reportportal.plugin.view.job;
+package org.jenkinsci.plugins.reportportal.plugin.view;
 
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
+import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.reportportal.plugin.model.DownStreamJobModel;
 import org.jenkinsci.plugins.reportportal.plugin.model.JobModel;
 import org.jenkinsci.plugins.reportportal.plugin.utils.JenkinsJobUtils;
@@ -17,29 +19,32 @@ import java.util.List;
 public class DownStreamJobView extends AbstractDescribableImpl<DownStreamJobView> implements JobView {
 
     private boolean enableReporting;
+    private String buildPattern;
     private String tags;
     private String description;
     private String parentJobTitle;
     private String jobToReportTitle;
     private String rpTestItemName;
     private List<DownStreamJobView> downStreamJobView;
+    private AdvancedNamingOptionsView advancedNamingOptions;
 
     @DataBoundConstructor
-    public DownStreamJobView(List<DownStreamJobView> downStreamJobView, String parentJobTitle, String jobToReportTitle, String rpTestItemName, String tags, String description, boolean enableReporting) {
+    public DownStreamJobView(List<DownStreamJobView> downStreamJobView, String parentJobTitle, String jobToReportTitle, AdvancedNamingOptionsView advancedNamingOptions, String rpTestItemName, String tags, String description, boolean enableReporting) {
         this.enableReporting = enableReporting;
         this.tags = tags;
         this.description = description;
         this.parentJobTitle = parentJobTitle;
         this.jobToReportTitle = jobToReportTitle;
+        this.advancedNamingOptions = advancedNamingOptions;
         this.rpTestItemName = rpTestItemName;
         this.downStreamJobView = downStreamJobView;
     }
 
-    public List<DownStreamJobView> getDownStreamJobView() {
-        return downStreamJobView;
+    public AdvancedNamingOptionsView getAdvancedNamingOptions() {
+        return advancedNamingOptions;
     }
 
-    public List<DownStreamJobView> getDownStreamJobView3() {
+    public List<DownStreamJobView> getDownStreamJobView() {
         return downStreamJobView;
     }
 
@@ -114,6 +119,41 @@ public class DownStreamJobView extends AbstractDescribableImpl<DownStreamJobView
         @Override
         public String getDisplayName() {
             return ">>>>>>>>";
+        }
+
+        public FormValidation doCheckJobToReportTitle(@QueryParameter String jobToReportTitle) {
+            if (jobToReportTitle.isEmpty()) {
+                return FormValidation.error("Jenkins job name must not be blank!");
+            }
+            if (Jenkins.getInstance().getItem(jobToReportTitle) == null) {
+                return FormValidation.warning(String.format("WARNING: Job with name '%s' wasn't found ob Jenkins. Typo?", jobToReportTitle));
+            }
+            return FormValidation.ok();
+        }
+
+        public FormValidation doCheckParentJobTitle(@QueryParameter String parentJobTitle) {
+            if (parentJobTitle.isEmpty()) {
+                return FormValidation.error("Parent jenkins job name must not be blank!");
+            }
+            if (Jenkins.getInstance().getItem(parentJobTitle) == null) {
+                return FormValidation.warning(String.format("WARNING: Job with name '%s' wasn't found ob Jenkins. Typo?", parentJobTitle));
+            }
+            return FormValidation.ok();
+        }
+
+        public FormValidation doCheckRpTestItemName(@QueryParameter String rpTestItemName) {
+            if (rpTestItemName.isEmpty()) {
+                return FormValidation.warning("WARNING: 'Downstream display name' is blank and will be filled with Downstream job original name.");
+            }
+            return FormValidation.ok();
+        }
+
+        public FormValidation doCheckDescription(@QueryParameter String launchDescription) {
+            return FormValidation.okWithMarkup("<i>NOTE: the description section on RP supports markdown, so you could format your text.</i>");
+        }
+
+        public FormValidation doCheckTags(@QueryParameter String tags) {
+            return FormValidation.okWithMarkup("<i>NOTE: use semicolon for separating tags.</i>");
         }
 
         private List<ListBoxModel.Option> getParentJobOptions() {

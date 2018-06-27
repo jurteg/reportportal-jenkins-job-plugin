@@ -1,7 +1,6 @@
 package org.jenkinsci.plugins.reportportal.plugin.model;
 
 import com.epam.reportportal.service.Launch;
-import com.google.common.base.Supplier;
 import hudson.model.Run;
 import org.jenkinsci.plugins.reportportal.plugin.utils.LaunchUtils;
 import org.jenkinsci.plugins.reportportal.plugin.view.Config;
@@ -13,10 +12,11 @@ import java.util.Set;
 
 public class LaunchModel implements ParentAware {
 
-    private static final String SPACE = " ";
+    private static final String SEMICOLON = ";";
 
     private boolean reportingEnabled;
     private String name;
+    private String buildPattern;
     private String description;
     private String tags;
     private UpstreamJobModel upstreamJobModel;
@@ -31,11 +31,16 @@ public class LaunchModel implements ParentAware {
         this.upstreamJobModel = new UpstreamJobModel(launchView.getUpStreamJobView(), this, run);
         this.run = run;
         this.reportingEnabled = launchView.getEnableReporting();
+        this.buildPattern = launchView.getBuildPattern();
     }
 
     public ParentAware getParent() {
         //throw new UnsupportedOperationException("Launch Model can't have any parent.");
         return parent;
+    }
+
+    public String getBuildPattern() {
+        return buildPattern;
     }
 
     public void start(Run run, Config config) {
@@ -128,7 +133,7 @@ public class LaunchModel implements ParentAware {
     protected Set<String> processTags(String delimitedString) {
         Set<String> tags = new HashSet<>();
         if (delimitedString != null) {
-            for (String tag : delimitedString.split(SPACE)) {
+            for (String tag : delimitedString.split(SEMICOLON)) {
                 tags.add(tag);
             }
         }

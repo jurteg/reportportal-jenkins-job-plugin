@@ -3,12 +3,14 @@ package org.jenkinsci.plugins.reportportal.plugin.view;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
-import org.jenkinsci.plugins.reportportal.plugin.view.job.UpStreamJobView;
+import hudson.util.FormValidation;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 
 public class LaunchView extends AbstractDescribableImpl<LaunchView> {
 
     private String launchName;
+    private String buildPattern;
     private String tags;
     private String launchDescription;
     private boolean enableReporting;
@@ -16,13 +18,18 @@ public class LaunchView extends AbstractDescribableImpl<LaunchView> {
     private UpStreamJobView upStreamJobView;
 
     @DataBoundConstructor
-    public LaunchView(UpStreamJobView upStreamJobView, Config config, String launchName, String tags, String launchDescription, boolean enableReporting) {
+    public LaunchView(UpStreamJobView upStreamJobView, Config config, String launchName, String buildPattern, String tags, String launchDescription, boolean enableReporting) {
         this.config = config;
         this.launchName = launchName;
+        this.buildPattern = buildPattern;
         this.tags = tags;
         this.launchDescription = launchDescription;
         this.enableReporting = enableReporting;
         this.upStreamJobView = upStreamJobView;
+    }
+
+    public String getBuildPattern() {
+        return buildPattern;
     }
 
     public boolean getEnableReporting() {
@@ -76,6 +83,31 @@ public class LaunchView extends AbstractDescribableImpl<LaunchView> {
         public String getDisplayName() {
             return ">>>>>>>>";
         }
+
+        /*
+        public FormValidation doCheckEnableReporting(@QueryParameter boolean enableReporting) {
+            if(!enableReporting) {
+                return FormValidation.error("Please NOTE this launch will not be reporting to RP server until it's disabled.");
+            }
+            return FormValidation.ok();
+        }
+        */
+
+        public FormValidation doCheckLaunchName(@QueryParameter String launchName) {
+            if(launchName.isEmpty()) {
+                return FormValidation.warning("WARNING: Launch name is blank and will be filled with corresponding Multijob name.");
+            }
+            return FormValidation.ok();
+        }
+
+        public FormValidation doCheckLaunchDescription(@QueryParameter String launchDescription) {
+           return FormValidation.okWithMarkup("<i>NOTE: the description section on RP supports markdown, so you could format your text.</i>");
+        }
+
+        public FormValidation doCheckTags(@QueryParameter String tags) {
+            return FormValidation.okWithMarkup("<i>NOTE: use semicolon for separating tags.</i>");
+        }
+
 
     }
 

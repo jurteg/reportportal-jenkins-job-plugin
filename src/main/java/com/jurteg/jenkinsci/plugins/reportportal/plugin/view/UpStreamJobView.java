@@ -1,11 +1,14 @@
-package org.jenkinsci.plugins.reportportal.plugin.view.job;
+package org.jenkinsci.plugins.reportportal.plugin.view;
 
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
+import hudson.util.FormValidation;
+import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.reportportal.plugin.model.DownStreamJobModel;
 import org.jenkinsci.plugins.reportportal.plugin.model.JobModel;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,25 +21,21 @@ public class UpStreamJobView extends AbstractDescribableImpl<UpStreamJobView> im
     private String description;
     private boolean enableReporting;
     private List<DownStreamJobView> downStreamJobView;
+    private AdvancedNamingOptionsView advancedNamingOptions;
 
     @DataBoundConstructor
-    public UpStreamJobView(List<DownStreamJobView> downStreamJobView, String rpTestItemName, String jobToReportTitle, String description, boolean enableReporting, String tags) {
+    public UpStreamJobView(List<DownStreamJobView> downStreamJobView, String rpTestItemName, String jobToReportTitle, AdvancedNamingOptionsView advancedNamingOptions, String description, boolean enableReporting, String tags) {
         this.rpTestItemName = rpTestItemName;
         this.jobToReportTitle = jobToReportTitle;
+        this.advancedNamingOptions = advancedNamingOptions;
         this.description = description;
         this.enableReporting = enableReporting;
         this.tags = tags;
         this.downStreamJobView = downStreamJobView;
     }
 
-    public List<DownStreamJobModel> createDownStreamJobModelList(JobModel parent) {
-        List<DownStreamJobModel> modelList = new ArrayList<>();
-        if(downStreamJobView != null) {
-            for (DownStreamJobView view : downStreamJobView) {
-                modelList.add(view.createModel(parent));
-            }
-        }
-        return modelList;
+    public AdvancedNamingOptionsView getAdvancedNamingOptions() {
+        return advancedNamingOptions;
     }
 
     @Override
@@ -79,10 +78,6 @@ public class UpStreamJobView extends AbstractDescribableImpl<UpStreamJobView> im
         return downStreamJobView;
     }
 
-    public List<DownStreamJobView> getDownStreamJobView3() {
-        return downStreamJobView;
-    }
-
     public void setDownStreamJobView(List<DownStreamJobView> downStreamJobView) {
         this.downStreamJobView = downStreamJobView;
     }
@@ -103,6 +98,16 @@ public class UpStreamJobView extends AbstractDescribableImpl<UpStreamJobView> im
         this.tags = tags;
     }
 
+    public List<DownStreamJobModel> createDownStreamJobModelList(JobModel parent) {
+        List<DownStreamJobModel> modelList = new ArrayList<>();
+        if (downStreamJobView != null) {
+            for (DownStreamJobView view : downStreamJobView) {
+                modelList.add(view.createModel(parent));
+            }
+        }
+        return modelList;
+    }
+
     @Extension
     public static class DescriptorImpl extends Descriptor<UpStreamJobView> {
 
@@ -110,6 +115,37 @@ public class UpStreamJobView extends AbstractDescribableImpl<UpStreamJobView> im
         public String getDisplayName() {
             return ">>>>>>>>";
         }
+
+        public FormValidation doCheckJobToReportTitle(@QueryParameter String jobToReportTitle) {
+            if(jobToReportTitle != null) {
+                if (jobToReportTitle.isEmpty()) {
+                    return FormValidation.error("Jenkins job name must not be blank!");
+                }
+                if (Jenkins.getInstance().getItem(jobToReportTitle) == null) {
+                    return FormValidation.warning(String.format("WARNING: Job with name '%s' wasn't found ob Jenkins. Typo?", jobToReportTitle));
+                }
+            }
+            return FormValidation.ok();
+        }
+
+        public FormValidation doCheckRpTestItemName(@QueryParameter String rpTestItemName) {
+            if (rpTestItemName != null && rpTestItemName.isEmpty()) {
+                return FormValidation.warning("WARNING: 'Multijob display name' is blank and will be filled with Multijob original name.");
+            }
+            return FormValidation.ok();
+        }
+
+        public FormValidation doCheckDescription(@QueryParameter String launchDescription) {
+            return FormValidation.okWithMarkup("<i>NOTE: the description section on RP supports markdown, so you could format your text.</i>");
+        }
+
+        public FormValidation doCheckTags(@QueryParameter String tags) {
+            return FormValidation.okWithMarkup("<i>NOTE: use semicolon for separating tags.</i>");
+        }
+
+
+
+
 
         /*
         public ListBoxModel doFillJobToReportTitleItems() {

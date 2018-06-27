@@ -1,20 +1,27 @@
-package org.jenkinsci.plugins.reportportal;
+package com.jurteg.jenkinsci.plugins.reportportal;
 
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.JobModel;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.LaunchModel;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.LaunchView;
+import hudson.model.AbstractProject;
 import hudson.model.Build;
 import hudson.model.Run;
-import org.jenkinsci.plugins.reportportal.plugin.model.JobModel;
-import org.jenkinsci.plugins.reportportal.plugin.model.LaunchModel;
-import org.jenkinsci.plugins.reportportal.plugin.view.LaunchView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ModelUtils {
 
+    private static final String MUlTI_JOB_PROJECT = "MultiJob Project";
+
     public static boolean haveSameParent(JobModel jobModel, Run run) {
-        if(jobModel.getParent() != null) {
-            return (((Build) run).getProject().getBuildingUpstream().getBuildingDownstream().getNextBuildNumber()) - (((JobModel)jobModel.getParent()).getRun().getNumber()) == 1;
-            //return run.getParent().getFullDisplayName().equals(((JobModel)jobModel.getParent()).getRun().getFullDisplayName());
+        if (jobModel.getParent() != null) {
+            AbstractProject parentProject = ((Build) run).getProject().getBuildingUpstream();
+            if (parentProject == null) {
+                throw new IllegalStateException(String.format("'%s' job should be downstream, but it has no parent (upstream job). " +
+                        "Please check Multijob dependencies on plugin configuration page.", run.getFullDisplayName()));
+            }
+            return parentProject.getLastBuild() == ((JobModel) jobModel.getParent()).getRun();
         }
         return false;
     }

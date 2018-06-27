@@ -10,12 +10,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class AbstractJobModel implements JobModel, Cloneable {
 
-    private static final String SPACE = " ";
+    private static final String SEMICOLON = ";";
 
     protected String jobName;
+    protected String buildNamePattern;
     protected String description;
     protected String tags;
     protected List<DownStreamJobModel> downStreamJobModelList;
@@ -172,12 +175,21 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
     protected Set<String> processTags(String delimitedString) {
         Set<String> tags = new HashSet<>();
         if(delimitedString != null) {
-            for (String tag : delimitedString.split(SPACE)) {
+            for (String tag : delimitedString.split(SEMICOLON)) {
                 tags.add(tag);
             }
         }
         return tags;
     }
 
+    protected String getModelNameUsingPattern(Run run, String regex) {
+        String name = "";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(run.getDisplayName());
+        if (matcher.matches()) {
+            name = matcher.group();
+        }
+        return name;
+    }
 
 }

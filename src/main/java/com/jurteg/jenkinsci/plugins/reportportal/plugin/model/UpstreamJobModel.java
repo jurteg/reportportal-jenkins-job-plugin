@@ -1,33 +1,27 @@
 package org.jenkinsci.plugins.reportportal.plugin.model;
 
+import hudson.model.Run;
 import org.jenkinsci.plugins.reportportal.plugin.utils.LaunchUtils;
-import org.jenkinsci.plugins.reportportal.plugin.view.job.JobView;
+import org.jenkinsci.plugins.reportportal.plugin.view.UpStreamJobView;
 
 import java.util.Objects;
 
-public class DownStreamJobModel extends AbstractJobModel {
+public class UpstreamJobModel extends AbstractJobModel {
 
-    public DownStreamJobModel(String rpTestItemName, DownStreamJobModel parent) {
-        this.rpTestItemName = rpTestItemName;
-        this.parent = parent;
-    }
-
-    public DownStreamJobModel(JobView view, ParentAware parent) {
+    public UpstreamJobModel(UpStreamJobView view, ParentAware parent, Run run) {
         this.jobName = view.getJobToReportTitle();
         this.description = view.getDescription();
         this.tags = view.getTags();
         this.rpTestItemName = view.getRpTestItemName();
+        this.downStreamJobModelList = view.createDownStreamJobModelList(this);
         this.parent = parent;
+        this.buildNamePattern = view.getAdvancedNamingOptions().getBuildPattern();
+        this.run = run;
     }
 
-    public DownStreamJobModel(JobModel jobModel) {
-        this.jobName = jobModel.getJobName();
-        this.description = jobModel.getDescription();
-        this.tags = jobModel.getTags();
-        this.rpTestItemName = jobModel.getRpTestItemName();
-        this.parent = (JobModel) jobModel.getParent();
-        this.run = jobModel.getRun();
-        this.downStreamJobModelList = jobModel.getDownStreamJobModelList();
+    @Override
+    public String getTestItemType() {
+        return "SUITE";
     }
 
     @Override
@@ -35,23 +29,25 @@ public class DownStreamJobModel extends AbstractJobModel {
         if (rpTestItemId != null) {
             throw new IllegalStateException("Attempting to start already running RP item: " + rpTestItemId.blockingGet());
         }
-        if (((JobModel) this.parent).getRpTestItemId() == null) {
+        if (((LaunchModel) getParent()).getRp() == null) {
             throw new IllegalStateException(String.format("Unable to run RP item for job model '%s' because parent item '%s' is not running.", toString(), parent.toString()));
         }
-        rpTestItemId = LaunchUtils.startTestItem(getLaunch().getRp(), ((JobModel) this.parent).getRpTestItemId(), rpTestItemName, description, processTags(tags), getTestItemType());
+        rpTestItemId = LaunchUtils.startTestItem(((LaunchModel) parent).getRp(), null, rpTestItemName, description, processTags(tags), getTestItemType());
         startLogItem();
     }
 
-    public String getTestItemType() {
-        return "SUITE";
+    @Override
+    public String toString() {
+        return "Job name: " + jobName + " Description: " + description + " Parent name: " + ((LaunchModel) parent).getName() + " Run full name: " + run.getFullDisplayName();
     }
+
 
     @Override
     public boolean equals(Object obj) {
         if (obj == null || obj.getClass() != this.getClass()) {
             return false;
         }
-        DownStreamJobModel other = (DownStreamJobModel) obj;
+        UpstreamJobModel other = (UpstreamJobModel) obj;
         return Objects.equals(jobName, other.jobName) &&
                 Objects.equals(description, other.description) &&
                 Objects.equals(tags, other.tags) &&
@@ -59,5 +55,4 @@ public class DownStreamJobModel extends AbstractJobModel {
                 Objects.equals(rpTestItemName, other.rpTestItemName) &&
                 Objects.equals(run, other.run);
     }
-
 }

@@ -1,8 +1,9 @@
-package org.jenkinsci.plugins.reportportal;
+package com.jurteg.jenkinsci.plugins.reportportal;
 
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.utils.UiUtils;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.JobView;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.LaunchView;
 import hudson.model.Run;
-import org.jenkinsci.plugins.reportportal.plugin.view.LaunchView;
-import org.jenkinsci.plugins.reportportal.plugin.view.job.JobView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ public class ViewUtils {
 
     public static List<LaunchView> getLaunchViewListForRun(Run run) {
         List<LaunchView> launchViewList = new ArrayList<>();
-        for (LaunchView launchView : org.jenkinsci.plugins.reportportal.plugin.utils.ViewUtils.getGeneralView().getEntries()) {
+        for (LaunchView launchView : UiUtils.getGeneralView().getEntries()) {
             if (launchView.getUpStreamJobView().getJobToReportTitle().equals(RunUtils.getRunJobName(run))) {
                 launchViewList.add(launchView);
             }

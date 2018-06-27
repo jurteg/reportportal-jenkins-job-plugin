@@ -5,6 +5,7 @@ import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
 import hudson.util.FormValidation;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 
 public final class Config extends AbstractDescribableImpl<Config> {
     private String uuid;
@@ -50,15 +51,27 @@ public final class Config extends AbstractDescribableImpl<Config> {
             return "Report Portal Configuration";
         }
 
-        public FormValidation doCheckUuid() {
+
+        public FormValidation doCheckUuid(@QueryParameter String uuid) {
+            if(uuid.isEmpty()) {
+                return FormValidation.error("UUID must not be blank");
+            }
+            return FormValidation.ok();
+        }
+        public FormValidation doCheckEndpoint(@QueryParameter String endpoint) {
+            if(endpoint.isEmpty()) {
+                return FormValidation.error("Server address must not be blank");
+            }
+            if(!endpoint.startsWith("http://") && !endpoint.startsWith("https://")) {
+                return FormValidation.error("Server address must be starting from http:// or https://");
+            }
             return FormValidation.ok();
         }
 
-        public FormValidation doCheckEndpoint() {
-            return FormValidation.ok();
-        }
-
-        public FormValidation doCheckProject() {
+        public FormValidation doCheckProject(@QueryParameter String project) {
+            if(project.isEmpty()) {
+                return FormValidation.error("Project name must not be blank");
+            }
             return FormValidation.ok();
         }
 
