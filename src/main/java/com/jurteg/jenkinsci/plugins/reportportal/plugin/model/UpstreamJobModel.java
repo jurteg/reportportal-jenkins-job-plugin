@@ -1,8 +1,8 @@
-package org.jenkinsci.plugins.reportportal.plugin.model;
+package com.jurteg.jenkinsci.plugins.reportportal.plugin.model;
 
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.utils.LaunchUtils;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.UpStreamJobView;
 import hudson.model.Run;
-import org.jenkinsci.plugins.reportportal.plugin.utils.LaunchUtils;
-import org.jenkinsci.plugins.reportportal.plugin.view.UpStreamJobView;
 
 import java.util.Objects;
 
@@ -15,7 +15,7 @@ public class UpstreamJobModel extends AbstractJobModel {
         this.rpTestItemName = view.getRpTestItemName();
         this.downStreamJobModelList = view.createDownStreamJobModelList(this);
         this.parent = parent;
-        this.buildNamePattern = view.getAdvancedNamingOptions().getBuildPattern();
+        this.buildPattern = getBuildPatternFromView(view);
         this.run = run;
     }
 
@@ -32,7 +32,7 @@ public class UpstreamJobModel extends AbstractJobModel {
         if (((LaunchModel) getParent()).getRp() == null) {
             throw new IllegalStateException(String.format("Unable to run RP item for job model '%s' because parent item '%s' is not running.", toString(), parent.toString()));
         }
-        rpTestItemId = LaunchUtils.startTestItem(((LaunchModel) parent).getRp(), null, rpTestItemName, description, processTags(tags), getTestItemType());
+        rpTestItemId = LaunchUtils.startTestItem(((LaunchModel) parent).getRp(), null, getComposedName(), description, processTags(tags), getTestItemType());
         startLogItem();
     }
 

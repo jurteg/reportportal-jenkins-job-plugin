@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.reportportal.plugin.utils;
+package com.jurteg.jenkinsci.plugins.reportportal.plugin.utils;
 
 import com.epam.reportportal.listeners.ListenerParameters;
 import com.epam.reportportal.service.Launch;
@@ -10,10 +10,10 @@ import com.epam.ta.reportportal.ws.model.StartTestItemRQ;
 import com.epam.ta.reportportal.ws.model.launch.Mode;
 import com.epam.ta.reportportal.ws.model.launch.StartLaunchRQ;
 import com.epam.ta.reportportal.ws.model.log.SaveLogRQ;
+import com.jurteg.jenkinsci.plugins.reportportal.RunResult;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.Config;
 import hudson.model.Run;
 import io.reactivex.Maybe;
-import org.jenkinsci.plugins.reportportal.RunResult;
-import org.jenkinsci.plugins.reportportal.plugin.view.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rp.com.google.common.base.Function;

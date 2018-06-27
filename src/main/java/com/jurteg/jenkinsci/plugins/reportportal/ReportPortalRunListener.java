@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.reportportal;
+package com.jurteg.jenkinsci.plugins.reportportal;
 
 import hudson.Extension;
 import hudson.model.Run;

@@ -1,24 +1,27 @@
-package org.jenkinsci.plugins.reportportal.plugin.model;
+package com.jurteg.jenkinsci.plugins.reportportal.plugin.model;
 
 import com.epam.reportportal.service.Launch;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.utils.LaunchUtils;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.AdvancedNamingOptionsView;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.JobView;
+import com.jurteg.jenkinsci.plugins.reportportal.runtimeutils.JobNamingUtils;
 import hudson.model.Run;
 import io.reactivex.Maybe;
-import org.jenkinsci.plugins.reportportal.plugin.utils.LaunchUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public abstract class AbstractJobModel implements JobModel, Cloneable {
 
     private static final String SEMICOLON = ";";
+    private static final String SPACE = " ";
 
     protected String jobName;
-    protected String buildNamePattern;
+    protected String buildPattern;
     protected String description;
     protected String tags;
     protected List<DownStreamJobModel> downStreamJobModelList;
@@ -41,8 +44,9 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
     }
 
     protected void startLogItem() {
-        String name = this.rpTestItemName + " Console Log";
-        String description = "";
+        String tempName = StringUtils.isEmpty(rpTestItemName) ? jobName : rpTestItemName;
+        String description = "Console Log";
+        String name = tempName + SPACE + description;
         jobLogItemId = LaunchUtils.startTestItem(getLaunch().getRp(), rpTestItemId, name, description, null, "STEP");
     }
 
@@ -92,6 +96,25 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
             downStreamJobModelList = new ArrayList<>();
         }
         downStreamJobModelList.add(jobModel);
+    }
+
+    @Override
+    public String getBuildPattern() {
+        return buildPattern;
+    }
+
+    public String getComposedName() {
+        StringBuilder builder = new StringBuilder();
+        if(!StringUtils.isEmpty(rpTestItemName)) {
+            builder.append(rpTestItemName);
+        } else {
+            builder.append(jobName);
+        }
+        builder.append(SPACE);
+        if(!StringUtils.isEmpty(buildPattern)) {
+            builder.append(JobNamingUtils.getResultedString(run.getDisplayName(), buildPattern).replace(SPACE + SPACE, SPACE).trim());
+        }
+        return builder.toString();
     }
 
     @Override
@@ -182,14 +205,12 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
         return tags;
     }
 
-    protected String getModelNameUsingPattern(Run run, String regex) {
-        String name = "";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(run.getDisplayName());
-        if (matcher.matches()) {
-            name = matcher.group();
+    protected String getBuildPatternFromView(JobView view) {
+        AdvancedNamingOptionsView options = view.getAdvancedNamingOptions();
+        if(options != null) {
+            return options.getBuildPattern();
         }
-        return name;
+        return null;
     }
 
 }

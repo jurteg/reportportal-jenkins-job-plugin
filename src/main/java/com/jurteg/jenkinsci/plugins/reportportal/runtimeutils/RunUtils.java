@@ -1,4 +1,4 @@
-package com.jurteg.jenkinsci.plugins.reportportal;
+package com.jurteg.jenkinsci.plugins.reportportal.runtimeutils;
 
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.DownStreamJobModel;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.JobModel;

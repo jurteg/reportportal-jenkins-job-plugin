@@ -1,10 +1,12 @@
-package org.jenkinsci.plugins.reportportal.plugin.model;
+package com.jurteg.jenkinsci.plugins.reportportal.plugin.model;
 
 import com.epam.reportportal.service.Launch;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.utils.LaunchUtils;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.Config;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.LaunchView;
+import com.jurteg.jenkinsci.plugins.reportportal.runtimeutils.JobNamingUtils;
 import hudson.model.Run;
-import org.jenkinsci.plugins.reportportal.plugin.utils.LaunchUtils;
-import org.jenkinsci.plugins.reportportal.plugin.view.Config;
-import org.jenkinsci.plugins.reportportal.plugin.view.LaunchView;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -13,6 +15,7 @@ import java.util.Set;
 public class LaunchModel implements ParentAware {
 
     private static final String SEMICOLON = ";";
+    private static final String SPACE = " ";
 
     private boolean reportingEnabled;
     private String name;
@@ -35,7 +38,6 @@ public class LaunchModel implements ParentAware {
     }
 
     public ParentAware getParent() {
-        //throw new UnsupportedOperationException("Launch Model can't have any parent.");
         return parent;
     }
 
@@ -48,7 +50,7 @@ public class LaunchModel implements ParentAware {
             throw new IllegalStateException("Attempting to start already running Launch Model: " + toString());
         }
         this.run = run;
-        rp = LaunchUtils.startLaunch(config, name, description, processTags(tags));
+        rp = LaunchUtils.startLaunch(config, getComposedName(), description, processTags(tags));
         upstreamJobModel.start();
     }
 
@@ -82,6 +84,20 @@ public class LaunchModel implements ParentAware {
 
     public String getName() {
         return name;
+    }
+
+    public String getComposedName() {
+        StringBuilder builder = new StringBuilder();
+        if(!StringUtils.isEmpty(name)) {
+            builder.append(name);
+        }else {
+            builder.append(upstreamJobModel.getJobName() + " Launch");
+        }
+        builder.append(SPACE);
+        if(!StringUtils.isEmpty(buildPattern)) {
+            builder.append(JobNamingUtils.getResultedString(run.getDisplayName(), buildPattern).replace(SPACE + SPACE, SPACE).trim());
+        }
+        return builder.toString();
     }
 
     public void setName(String name) {

@@ -1,15 +1,15 @@
-package org.jenkinsci.plugins.reportportal.plugin.view;
+package com.jurteg.jenkinsci.plugins.reportportal.plugin.view;
 
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.DownStreamJobModel;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.JobModel;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.utils.JenkinsJobUtils;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.utils.UiUtils;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.reportportal.plugin.model.DownStreamJobModel;
-import org.jenkinsci.plugins.reportportal.plugin.model.JobModel;
-import org.jenkinsci.plugins.reportportal.plugin.utils.JenkinsJobUtils;
-import org.jenkinsci.plugins.reportportal.plugin.utils.ViewUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
@@ -157,7 +157,7 @@ public class DownStreamJobView extends AbstractDescribableImpl<DownStreamJobView
         }
 
         private List<ListBoxModel.Option> getParentJobOptions() {
-            return getParentJobOptions(ViewUtils.getExistingUpStreamJobNames());
+            return getParentJobOptions(UiUtils.getExistingUpStreamJobNames());
         }
 
         private List<ListBoxModel.Option> getParentJobOptions(List<String> jobNames) {
@@ -177,7 +177,7 @@ public class DownStreamJobView extends AbstractDescribableImpl<DownStreamJobView
                 jobNameList.add(new ListBoxModel.Option("No upstream jobs are set."));
                 return jobNameList;
             }
-            for (String job : ViewUtils.getJenkinsJobChildrenNames(parentJobTitle)) {
+            for (String job : UiUtils.getJenkinsJobChildrenNames(parentJobTitle)) {
                 jobNameList.add(new ListBoxModel.Option(job.trim()));
             }
             if(jobNameList.isEmpty()) {

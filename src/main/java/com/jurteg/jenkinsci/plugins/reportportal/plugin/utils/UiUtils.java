@@ -1,20 +1,17 @@
 package com.jurteg.jenkinsci.plugins.reportportal.plugin.utils;
 
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.ReportPortalPlugin;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.GeneralView;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.LaunchView;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.UpStreamJobView;
 import hudson.model.Action;
 import hudson.model.Item;
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.reportportal.plugin.view.GeneralView;
-import org.jenkinsci.plugins.reportportal.plugin.view.UpStreamJobView;
-import org.jenkinsci.plugins.reportportal.plugin.view.LaunchView;
-import org.jenkinsci.plugins.reportportal.plugin.ReportPortalPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewUtils {
+public class UiUtils {
 
     public static ReportPortalPlugin getPlugin() {
         List<Action> actions = Jenkins.getInstance().getActions();

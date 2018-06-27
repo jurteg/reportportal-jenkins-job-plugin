@@ -1,5 +1,6 @@
-package org.jenkinsci.plugins.reportportal.plugin;
+package com.jurteg.jenkinsci.plugins.reportportal.plugin;
 
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.GeneralView;
 import hudson.Extension;
 import hudson.ExtensionPoint;
 import hudson.XmlFile;
@@ -7,7 +8,6 @@ import hudson.model.AbstractDescribableImpl;
 import hudson.model.RootAction;
 import hudson.util.FormApply;
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.reportportal.plugin.view.GeneralView;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
 

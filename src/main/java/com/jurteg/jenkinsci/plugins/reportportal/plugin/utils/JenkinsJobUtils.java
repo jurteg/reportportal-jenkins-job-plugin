@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.reportportal.plugin.utils;
+package com.jurteg.jenkinsci.plugins.reportportal.plugin.utils;
 
 
 import hudson.model.Item;

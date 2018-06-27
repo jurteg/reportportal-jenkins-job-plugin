@@ -1,23 +1,27 @@
-package org.jenkinsci.plugins.reportportal;
+package com.jurteg.jenkinsci.plugins.reportportal;
 
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.LaunchModel;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.utils.UiUtils;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.Config;
+import com.jurteg.jenkinsci.plugins.reportportal.runtimeutils.ModelUtils;
+import com.jurteg.jenkinsci.plugins.reportportal.runtimeutils.RunUtils;
 import hudson.model.Run;
-import org.jenkinsci.plugins.reportportal.plugin.model.LaunchModel;
-import org.jenkinsci.plugins.reportportal.plugin.utils.ViewUtils;
-import org.jenkinsci.plugins.reportportal.plugin.view.Config;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
 
 public class RunProcessor {
 
 
     private static final Object EXISTING_LAUNCH_MODEL_MONITOR = new Object();
-    private static List<LaunchModel> runningLaunchModelList = new ArrayList<>();
+    private static List<LaunchModel> runningLaunchModelList = Collections.synchronizedList(new ArrayList<>());
 
 
     public static void onStarted(Run run) {
-        if (ViewUtils.getGeneralView() != null) {
-            Config config = ViewUtils.getGeneralView().getConfig();
+        if (UiUtils.getGeneralView() != null) {
+            Config config = UiUtils.getGeneralView().getConfig();
             if (config != null) {
                 synchronized (EXISTING_LAUNCH_MODEL_MONITOR) {
                     RunUtils.runExistingDownstreamJobsOrCreateSiblings(run, runningLaunchModelList);

@@ -1,4 +1,4 @@
-package com.jurteg.jenkinsci.plugins.reportportal;
+package com.jurteg.jenkinsci.plugins.reportportal.runtimeutils;
 
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.JobModel;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.LaunchModel;
@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ModelUtils {
-
-    private static final String MUlTI_JOB_PROJECT = "MultiJob Project";
 
     public static boolean haveSameParent(JobModel jobModel, Run run) {
         if (jobModel.getParent() != null) {
@@ -30,10 +28,8 @@ public class ModelUtils {
         List<LaunchModel> launchModelList = new ArrayList<>();
         for (LaunchView launchView : ViewUtils.getLaunchViewListForRun(run)) {
             LaunchModel launchModel = new LaunchModel(launchView, run);
-            //launchModel.setRun(run);//wrong, should set run only for appropriate model
             launchModelList.add(launchModel);
         }
-        //нужно добавлять ран в модель, только если джоба является апстримной. Для даунстрима всё равно нужно добавлять, только в соответствующую модель
         return launchModelList;
     }
 

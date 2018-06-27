@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.reportportal.plugin.view;
+package com.jurteg.jenkinsci.plugins.reportportal.plugin.view;
 
 import com.google.common.collect.ImmutableList;
 import hudson.Extension;

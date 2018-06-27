@@ -1,12 +1,12 @@
-package org.jenkinsci.plugins.reportportal.plugin.view;
+package com.jurteg.jenkinsci.plugins.reportportal.plugin.view;
 
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.DownStreamJobModel;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.JobModel;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
 import hudson.util.FormValidation;
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.reportportal.plugin.model.DownStreamJobModel;
-import org.jenkinsci.plugins.reportportal.plugin.model.JobModel;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
@@ -100,7 +100,7 @@ public class UpStreamJobView extends AbstractDescribableImpl<UpStreamJobView> im
 
     public List<DownStreamJobModel> createDownStreamJobModelList(JobModel parent) {
         List<DownStreamJobModel> modelList = new ArrayList<>();
-        if (downStreamJobView != null) {
+        if (downStreamJobView != null && !downStreamJobView.isEmpty()) {
             for (DownStreamJobView view : downStreamJobView) {
                 modelList.add(view.createModel(parent));
             }

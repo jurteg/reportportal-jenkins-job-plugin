@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.reportportal.plugin.model;
+package com.jurteg.jenkinsci.plugins.reportportal.plugin.model;
 
 import hudson.model.Run;
 import io.reactivex.Maybe;
@@ -26,6 +26,8 @@ public interface JobModel extends ParentAware {
     String getDescription();
 
     String getTags();
+
+    String getBuildPattern();
 
     List<DownStreamJobModel> getDownStreamJobModelList();
 

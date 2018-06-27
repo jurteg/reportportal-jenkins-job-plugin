@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.reportportal.plugin;
+package com.jurteg.jenkinsci.plugins.reportportal.plugin;
 
 import hudson.model.Descriptor;
 
