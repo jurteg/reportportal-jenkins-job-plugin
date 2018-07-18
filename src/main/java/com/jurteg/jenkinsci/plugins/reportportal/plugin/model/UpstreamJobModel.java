@@ -29,10 +29,10 @@ public class UpstreamJobModel extends AbstractJobModel {
         if (rpTestItemId != null) {
             throw new IllegalStateException("Attempting to start already running RP item: " + rpTestItemId.blockingGet());
         }
-        if (((LaunchModel) getParent()).getRp() == null) {
+        if (((LaunchModel) getParent()).getLaunch() == null) {
             throw new IllegalStateException(String.format("Unable to run RP item for job model '%s' because parent item '%s' is not running.", toString(), parent.toString()));
         }
-        rpTestItemId = LaunchUtils.startTestItem(((LaunchModel) parent).getRp(), null, getComposedName(), description, processTags(tags), getTestItemType());
+        rpTestItemId = LaunchUtils.startTestItem(((LaunchModel) parent).getLaunch(), null, getComposedName(), description, processTags(tags), getTestItemType());
         startLogItem();
     }
 

@@ -10,14 +10,26 @@ import javax.annotation.Nonnull;
 @Extension
 public class ReportPortalRunListener extends RunListener<Run> {
 
+    private static final Object EXISTING_LAUNCH_MODEL_MONITOR = new Object();
+
     @Override
     public void onStarted(Run run, TaskListener listener) {
-        RunProcessor.onStarted(run);
+        try {
+            RunProcessor.onStarted(run);
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("Unable to correctly start '%s'. \\n %s", run.getFullDisplayName(), e.getMessage()));
+        }
     }
 
     @Override
     public void onCompleted(Run run, @Nonnull TaskListener listener) {
-        RunProcessor.onCompleted(run);
+        synchronized (EXISTING_LAUNCH_MODEL_MONITOR) {
+            try {
+                RunProcessor.onCompleted(run);
+            } catch (Exception e) {
+                throw new RuntimeException(String.format("Unable to correctly finish '%s'. \\n %s", run.getFullDisplayName(), e.getMessage()));
+            }
+        }
     }
 
 

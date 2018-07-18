@@ -30,6 +30,7 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
     protected Maybe<String> rpTestItemId;
     protected Run run;
     protected Maybe<String> jobLogItemId;
+    protected boolean isClone;
 
     @Override
     public void start(Run run) {
@@ -47,7 +48,7 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
         String tempName = StringUtils.isEmpty(rpTestItemName) ? jobName : rpTestItemName;
         String description = "Console Log";
         String name = tempName + SPACE + description;
-        jobLogItemId = LaunchUtils.startTestItem(getLaunch().getRp(), rpTestItemId, name, description, null, "STEP");
+        jobLogItemId = LaunchUtils.startTestItem(getLaunch().getLaunch(), rpTestItemId, name, description, null, "STEP");
     }
 
     @Override
@@ -61,8 +62,8 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
     }
 
     @Override
-    public void finish(Run run) {
-        Launch rpLaunch = getLaunch().getRp();
+    public void finish() {
+        Launch rpLaunch = getLaunch().getLaunch();
         LaunchUtils.finishTestItem(rpLaunch, jobLogItemId, run);
         LaunchUtils.finishTestItem(rpLaunch, rpTestItemId, run, false);
     }
@@ -158,6 +159,16 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
         this.tags = tags;
     }
 
+    @Override
+    public boolean isClone() {
+        return isClone;
+    }
+
+    @Override
+    public void setIsClone(boolean isClone) {
+        this.isClone = isClone;
+    }
+
     public List<DownStreamJobModel> getDownStreamJobModelList() {
         return downStreamJobModelList;
     }
@@ -186,12 +197,15 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
         newModel.setRpTestItemId(null);
         newModel.setRun(null);
         newModel.setJobLogItemId(null);
+        newModel.setIsClone(true);
         if(getDownStreamJobModelList() != null) {
             for (DownStreamJobModel model : getDownStreamJobModelList()) {
                 modelList.add((DownStreamJobModel) model.clone());
             }
         }
-        newModel.setDownStreamJobModelList(modelList);
+        if(!modelList.isEmpty()) {
+            newModel.setDownStreamJobModelList(modelList);
+        }
         return newModel;
     }
 

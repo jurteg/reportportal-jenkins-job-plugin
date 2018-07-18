@@ -5,7 +5,7 @@ import io.reactivex.Maybe;
 
 import java.util.List;
 
-public interface JobModel extends ParentAware {
+public interface JobModel extends ParentAware, ExecutableModel {
 
     Maybe<String> getRpTestItemId();
 
@@ -35,15 +35,15 @@ public interface JobModel extends ParentAware {
 
     void addDownStreamJobModel(DownStreamJobModel jobModel);
 
-    void start();
-
     void start(Run run);
-
-    void finish(Run run);
 
     LaunchModel getLaunch();
 
     String getTestItemType();
+
+    boolean isClone();
+
+    void setIsClone(boolean isClone);
 
 
 

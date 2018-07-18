@@ -14,11 +14,11 @@ public class LaunchView extends AbstractDescribableImpl<LaunchView> {
     private String tags;
     private String launchDescription;
     private boolean enableReporting;
-    private final Config config;
+    private final ConfigView config;
     private UpStreamJobView upStreamJobView;
 
     @DataBoundConstructor
-    public LaunchView(UpStreamJobView upStreamJobView, Config config, String launchName, String buildPattern, String tags, String launchDescription, boolean enableReporting) {
+    public LaunchView(UpStreamJobView upStreamJobView, ConfigView config, String launchName, String buildPattern, String tags, String launchDescription, boolean enableReporting) {
         this.config = config;
         this.launchName = launchName;
         this.buildPattern = buildPattern;
@@ -64,7 +64,7 @@ public class LaunchView extends AbstractDescribableImpl<LaunchView> {
         this.launchDescription = launchDescription;
     }
 
-    public Config getConfig() {
+    public ConfigView getConfig() {
         return config;
     }
 

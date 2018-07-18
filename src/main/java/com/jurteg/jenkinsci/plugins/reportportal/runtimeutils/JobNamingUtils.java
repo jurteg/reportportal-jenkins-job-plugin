@@ -9,12 +9,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class JobNamingUtils {
 
     public static boolean anyOfBuildsMatchPattern(String jobName, String regex) {
         for (String name : getBuildNames(jobName)) {
-            if (getMatcher(name, regex).find()) {
+            Matcher matcher = getMatcher(name, regex);
+            if (matcher == null) {
+                return false;
+            }
+            if (matcher.find()) {
                 return true;
             }
         }
@@ -33,6 +38,9 @@ public class JobNamingUtils {
 
     public static String getResultedString(String string, String pattern) {
         Matcher matcher = getMatcher(string, pattern);
+        if(matcher == null) {
+            return "";
+        }
         if (matcher.find()) {
             return matcher.group();
         }
@@ -40,8 +48,12 @@ public class JobNamingUtils {
     }
 
     public static Matcher getMatcher(String string, String regex) {
-        Pattern pattern = Pattern.compile(regex);
-        return pattern.matcher(string);
+        try {
+            Pattern pattern = Pattern.compile(regex);
+            return pattern.matcher(string);
+        } catch (PatternSyntaxException e) {
+            return null;
+        }
     }
 
     public static List<String> getBuildNames(String jobName) {

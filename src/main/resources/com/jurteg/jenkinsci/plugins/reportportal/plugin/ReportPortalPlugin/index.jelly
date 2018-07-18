@@ -2,6 +2,12 @@
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:l="/lib/layout">
     <l:layout title="Configure">
         <l:main-panel>
+            <j:set var="version" value="${it.version}"/>
+            <b>
+                <div align="right">
+                    Version: ${version}
+                </div>
+            </b>
             <h1>Report Portal Configuration</h1>
             <f:form action="configSubmit" name="generalView" method="post">
                 <j:set var="instance" value="${it}"/>

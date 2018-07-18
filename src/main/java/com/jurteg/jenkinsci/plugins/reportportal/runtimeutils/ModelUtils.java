@@ -1,5 +1,6 @@
 package com.jurteg.jenkinsci.plugins.reportportal.runtimeutils;
 
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.ConfigModel;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.JobModel;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.LaunchModel;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.LaunchView;
@@ -24,10 +25,10 @@ public class ModelUtils {
         return false;
     }
 
-    public static List<LaunchModel> getLaunchModelListToRun(Run run) {
+    public static List<LaunchModel> getLaunchModelListToRun(Run run, ConfigModel config) {
         List<LaunchModel> launchModelList = new ArrayList<>();
         for (LaunchView launchView : ViewUtils.getLaunchViewListForRun(run)) {
-            LaunchModel launchModel = new LaunchModel(launchView, run);
+            LaunchModel launchModel = new LaunchModel(launchView, run, config);
             launchModelList.add(launchModel);
         }
         return launchModelList;
@@ -36,7 +37,7 @@ public class ModelUtils {
     public static List<LaunchModel> getExistingLaunchesToFinish(Run run, List<LaunchModel> runningLaunchesList) {
         List<LaunchModel> launchesToFinish = new ArrayList<>();
         for (LaunchModel model : runningLaunchesList) {
-            if (model.getUpstreamJobModel().getRun().getFullDisplayName().equals(run.getFullDisplayName())) {
+            if (model.getUpstreamJobModel().getRun().equals(run)) {
                 launchesToFinish.add(model);
             }
         }

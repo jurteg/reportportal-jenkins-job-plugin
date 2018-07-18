@@ -11,7 +11,7 @@ import com.epam.ta.reportportal.ws.model.launch.Mode;
 import com.epam.ta.reportportal.ws.model.launch.StartLaunchRQ;
 import com.epam.ta.reportportal.ws.model.log.SaveLogRQ;
 import com.jurteg.jenkinsci.plugins.reportportal.RunResult;
-import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.Config;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.ConfigModel;
 import hudson.model.Run;
 import io.reactivex.Maybe;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public class LaunchUtils {
     /**
      * Start RP launch
      */
-    public static Launch startLaunch(Config config, String launchName, String launchDescription, Set<String> tags) {
+    public static Launch startLaunch(ConfigModel config, String launchName, String launchDescription, Set<String> tags) {
         /* should no be lazy */
         final Date startTime = Calendar.getInstance().getTime();
         final ReportPortal reportPortal = ReportPortal.builder().withParameters(getListenerParameters(config)).build();
@@ -127,9 +127,9 @@ public class LaunchUtils {
      */
     public static String mapLevel(String status) {
         String mapped = null;
-        if (status.equalsIgnoreCase("passed")) {
+        if ("passed".equalsIgnoreCase(status)) {
             mapped = "INFO";
-        } else if (status.equalsIgnoreCase("skipped")) {
+        } else if ("skipped".equalsIgnoreCase(status)) {
             mapped = "WARN";
         } else {
             mapped = "ERROR";
@@ -137,7 +137,7 @@ public class LaunchUtils {
         return mapped;
     }
 
-    public static ListenerParameters getListenerParameters(Config config) {
+    public static ListenerParameters getListenerParameters(ConfigModel config) {
         ListenerParameters listenerParameters = new ListenerParameters(PropertiesLoader.load());
         listenerParameters.setUuid(config.getUuid());
         listenerParameters.setProjectName(config.getProject());

@@ -10,7 +10,7 @@
                 <f:textbox/>
             </f:entry>
             <f:entry title="UUID" field="uuid">
-                <f:textbox/>
+                <f:password/>
             </f:entry>
         </f:block>
     </f:section>

@@ -24,7 +24,7 @@ public class DownStreamJobModel extends AbstractJobModel {
         if (((JobModel) this.parent).getRpTestItemId() == null) {
             throw new IllegalStateException(String.format("Unable to run RP item for job model '%s' because parent item '%s' is not running.", toString(), parent.toString()));
         }
-        rpTestItemId = LaunchUtils.startTestItem(getLaunch().getRp(), ((JobModel) this.parent).getRpTestItemId(), getComposedName(), description, processTags(tags), getTestItemType());
+        rpTestItemId = LaunchUtils.startTestItem(getLaunch().getLaunch(), ((JobModel) this.parent).getRpTestItemId(), getComposedName(), description, processTags(tags), getTestItemType());
         startLogItem();
     }
 

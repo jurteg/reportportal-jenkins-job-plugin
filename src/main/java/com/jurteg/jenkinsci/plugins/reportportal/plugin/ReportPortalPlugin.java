@@ -10,16 +10,25 @@ import hudson.util.FormApply;
 import jenkins.model.Jenkins;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 @Extension
 public final class ReportPortalPlugin extends AbstractDescribableImpl<ReportPortalPlugin> implements ExtensionPoint, RootAction {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(ReportPortalPlugin.class);
+
     private final static String CONFIG_FILE = "rpconfig.xml";
+    private final static String VERSION = "application.version";
     private GeneralView generalView;
+    private String version;
+    private final static String PROPERTY_FILE_PATH = "/properties.properties";
 
     public XmlFile getConfigFile() {
         return new XmlFile(new File(Jenkins.getInstance().getRootDir(), CONFIG_FILE));
@@ -30,9 +39,11 @@ public final class ReportPortalPlugin extends AbstractDescribableImpl<ReportPort
         if (xml.exists()) {
             xml.unmarshal(this);
         }
+        version = getVersion();
     }
 
     public HttpResponse doConfigSubmit(StaplerRequest req) throws ServletException, IOException {
+        Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
         generalView = null; // otherwise bindJSON will never clear it once set
         req.bindJSON(this, req.getSubmittedForm());
         getConfigFile().write(this);
@@ -52,6 +63,7 @@ public final class ReportPortalPlugin extends AbstractDescribableImpl<ReportPort
     }
 
     public String getUrlName() {
+        //Jenkins.getInstance().checkPermission(Jenkins.READ);
         return "report-portal-job-reporting";
     }
 
@@ -65,6 +77,18 @@ public final class ReportPortalPlugin extends AbstractDescribableImpl<ReportPort
     public ReportPortalPluginDescriptor getDescriptor() {
         return (ReportPortalPluginDescriptor) super.getDescriptor();
     }
+
+    public String getVersion() {
+        Properties properties = new Properties();
+        try {
+            InputStream resourceAsStream = this.getClass().getResourceAsStream(PROPERTY_FILE_PATH);
+            properties.load(resourceAsStream);
+        } catch (Exception e) {
+            LOGGER.error("Unable to load properties from: " + PROPERTY_FILE_PATH);
+        }
+        return properties.getProperty(VERSION);
+    }
+
 
     @Extension
     public static class DescriptorImpl extends ReportPortalPluginDescriptor {

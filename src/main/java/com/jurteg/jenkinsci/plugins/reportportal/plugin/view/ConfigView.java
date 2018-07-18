@@ -7,7 +7,7 @@ import hudson.util.FormValidation;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
-public final class Config extends AbstractDescribableImpl<Config> {
+public final class ConfigView extends AbstractDescribableImpl<ConfigView> {
     private String uuid;
     private String project;
     private String endpoint;
@@ -37,14 +37,14 @@ public final class Config extends AbstractDescribableImpl<Config> {
     }
 
     @DataBoundConstructor
-    public Config(String endpoint, String uuid, String project) {
+    public ConfigView(String endpoint, String uuid, String project) {
         this.endpoint = endpoint;
         this.uuid = uuid;
         this.project = project;
     }
 
     @Extension
-    public static class DescriptorImpl extends Descriptor<Config> {
+    public static class DescriptorImpl extends Descriptor<ConfigView> {
 
         @Override
         public String getDisplayName() {

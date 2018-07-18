@@ -13,14 +13,14 @@ import java.util.List;
 
 public class GeneralView extends AbstractDescribableImpl<GeneralView> {
 
-    private final Config config;
+    private final ConfigView config;
     private final List<LaunchView> entries;
 
     public List<LaunchView> getEntries() {
         return Collections.unmodifiableList(entries);
     }
 
-    public Config getConfig() {
+    public ConfigView getConfig() {
         return config;
     }
 
@@ -29,7 +29,7 @@ public class GeneralView extends AbstractDescribableImpl<GeneralView> {
     }
 
     @DataBoundConstructor
-    public GeneralView(Config config, List<LaunchView> entries) {
+    public GeneralView(ConfigView config, List<LaunchView> entries) {
         this.config = config;
         this.entries = entries != null ? new ArrayList<>(entries) : Collections.<LaunchView>emptyList();
     }

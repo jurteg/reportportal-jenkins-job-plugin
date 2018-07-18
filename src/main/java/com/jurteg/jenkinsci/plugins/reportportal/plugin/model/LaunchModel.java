@@ -2,7 +2,6 @@ package com.jurteg.jenkinsci.plugins.reportportal.plugin.model;
 
 import com.epam.reportportal.service.Launch;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.utils.LaunchUtils;
-import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.Config;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.LaunchView;
 import com.jurteg.jenkinsci.plugins.reportportal.runtimeutils.JobNamingUtils;
 import hudson.model.Run;
@@ -12,7 +11,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class LaunchModel implements ParentAware {
+public class LaunchModel implements ParentAware, ExecutableModel {
 
     private static final String SEMICOLON = ";";
     private static final String SPACE = " ";
@@ -23,15 +22,17 @@ public class LaunchModel implements ParentAware {
     private String description;
     private String tags;
     private UpstreamJobModel upstreamJobModel;
+    private ConfigModel config;
     private Run run;
     private ParentAware parent;
-    private Launch rp;
+    private Launch launch;
 
-    public LaunchModel(LaunchView launchView, Run run) {
+    public LaunchModel(LaunchView launchView, Run run, ConfigModel config) {
         this.name = launchView.getLaunchName();
         this.description = launchView.getLaunchDescription();
         this.tags = launchView.getTags();
         this.upstreamJobModel = new UpstreamJobModel(launchView.getUpStreamJobView(), this, run);
+        this.config = config;
         this.run = run;
         this.reportingEnabled = launchView.getEnableReporting();
         this.buildPattern = launchView.getBuildPattern();
@@ -45,21 +46,21 @@ public class LaunchModel implements ParentAware {
         return buildPattern;
     }
 
-    public void start(Run run, Config config) {
-        if (rp != null) {
+    public void start() {
+        if (launch != null) {
             throw new IllegalStateException("Attempting to start already running Launch Model: " + toString());
         }
-        this.run = run;
-        rp = LaunchUtils.startLaunch(config, getComposedName(), description, processTags(tags));
+        launch = LaunchUtils.startLaunch(config, getComposedName(), description, processTags(tags));
         upstreamJobModel.start();
     }
 
     public void finish() {
-        LaunchUtils.finishLaunch(rp);
+        getUpstreamJobModel().finish();
+        LaunchUtils.finishLaunch(launch);
     }
 
-    public Launch getRp() {
-        return rp;
+    public Launch getLaunch() {
+        return launch;
     }
 
     public void setParent(ParentAware parent) {
