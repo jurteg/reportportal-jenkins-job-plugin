@@ -13,7 +13,7 @@ public class DownStreamJobModel extends AbstractJobModel {
         this.tags = view.getTags();
         this.rpTestItemName = view.getRpTestItemName();
         this.parent = parent;
-        this.buildPattern = getBuildPatternFromView(view);
+        resolveBaseName();
     }
 
     @Override
@@ -24,7 +24,7 @@ public class DownStreamJobModel extends AbstractJobModel {
         if (((JobModel) this.parent).getRpTestItemId() == null) {
             throw new IllegalStateException(String.format("Unable to run RP item for job model '%s' because parent item '%s' is not running.", toString(), parent.toString()));
         }
-        rpTestItemId = LaunchUtils.startTestItem(getLaunch().getLaunch(), ((JobModel) this.parent).getRpTestItemId(), getComposedName(), description, processTags(tags), getTestItemType());
+        rpTestItemId = LaunchUtils.startTestItem(getLaunch().getLaunch(), ((JobModel) this.parent).getRpTestItemId(), getComposedName(), getComposedDescription(), processTags(tags), getTestItemType());
         startLogItem();
     }
 

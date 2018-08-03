@@ -1,6 +1,7 @@
 package com.jurteg.jenkinsci.plugins.reportportal.plugin.model;
 
 import hudson.model.Run;
+import hudson.model.TaskListener;
 import io.reactivex.Maybe;
 
 import java.util.List;
@@ -21,13 +22,17 @@ public interface JobModel extends ParentAware, ExecutableModel {
 
     String getJobName();
 
+    void resolveBaseName();
+
+    void setNameAttributesList(List<String> nameAttributesList);
+
     String getRpTestItemName();
 
     String getDescription();
 
     String getTags();
 
-    String getBuildPattern();
+    String getComposedName();
 
     List<DownStreamJobModel> getDownStreamJobModelList();
 
@@ -45,6 +50,6 @@ public interface JobModel extends ParentAware, ExecutableModel {
 
     void setIsClone(boolean isClone);
 
-
+    void setTaskListener(TaskListener listener);
 
 }

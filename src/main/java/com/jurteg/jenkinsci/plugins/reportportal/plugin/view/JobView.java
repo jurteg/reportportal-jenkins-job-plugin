@@ -8,12 +8,6 @@ public interface JobView {
 
     String getDescription();
 
-    AdvancedNamingOptionsView getAdvancedNamingOptions();
-
-    boolean getEnableReporting();
-
-    void setEnableReporting(boolean enableReporting);
-
     String getParentJobTitle();
 
     void setParentJobTitle(String parentJobTitle);

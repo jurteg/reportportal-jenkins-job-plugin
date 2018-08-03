@@ -13,10 +13,6 @@
                 <f:textbox/>
             </f:entry>
 
-            <f:entry>
-                <f:optionalProperty field="advancedNamingOptions" title="Advanced naming"/>
-            </f:entry>
-
             <f:entry title="Multi job description" field="description">
                 <f:textarea/>
             </f:entry>

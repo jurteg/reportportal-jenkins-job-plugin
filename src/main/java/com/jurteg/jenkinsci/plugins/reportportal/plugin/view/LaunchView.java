@@ -14,11 +14,12 @@ public class LaunchView extends AbstractDescribableImpl<LaunchView> {
     private String tags;
     private String launchDescription;
     private boolean enableReporting;
+    private boolean useUpstreamJobName;
     private final ConfigView config;
     private UpStreamJobView upStreamJobView;
 
     @DataBoundConstructor
-    public LaunchView(UpStreamJobView upStreamJobView, ConfigView config, String launchName, String buildPattern, String tags, String launchDescription, boolean enableReporting) {
+    public LaunchView(UpStreamJobView upStreamJobView, ConfigView config, String launchName, String buildPattern, String tags, String launchDescription, boolean enableReporting, boolean useUpstreamJobName) {
         this.config = config;
         this.launchName = launchName;
         this.buildPattern = buildPattern;
@@ -26,6 +27,7 @@ public class LaunchView extends AbstractDescribableImpl<LaunchView> {
         this.launchDescription = launchDescription;
         this.enableReporting = enableReporting;
         this.upStreamJobView = upStreamJobView;
+        this.useUpstreamJobName = useUpstreamJobName;
     }
 
     public String getBuildPattern() {
@@ -83,15 +85,6 @@ public class LaunchView extends AbstractDescribableImpl<LaunchView> {
         public String getDisplayName() {
             return ">>>>>>>>";
         }
-
-        /*
-        public FormValidation doCheckEnableReporting(@QueryParameter boolean enableReporting) {
-            if(!enableReporting) {
-                return FormValidation.error("Please NOTE this launch will not be reporting to RP server until it's disabled.");
-            }
-            return FormValidation.ok();
-        }
-        */
 
         public FormValidation doCheckLaunchName(@QueryParameter String launchName) {
             if(launchName.isEmpty()) {

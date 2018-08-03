@@ -1,67 +1,51 @@
 package com.jurteg.jenkinsci.plugins.reportportal.runtimeutils;
 
+import com.jurteg.jenkinsci.plugins.reportportal.Context;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.ConfigModel;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.DownStreamJobModel;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.ExecutableModel;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.JobModel;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.LaunchModel;
-import com.jurteg.jenkinsci.plugins.reportportal.runtime.ReporterThreadFactory;
 import com.jurteg.jenkinsci.plugins.reportportal.runtime.RunnableModel;
 import hudson.model.Run;
+import hudson.model.TaskListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public class RunUtils {
 
     private static Logger LOGGER = LoggerFactory.getLogger(RunUtils.class);
-    private static ThreadPoolExecutor executor = new ThreadPoolExecutor(10, 20, 5, TimeUnit.HOURS,
-            new LinkedBlockingQueue<>(), new ReporterThreadFactory());
-    private static Map<Run, List<RunnableModel>> runnableModelMap = new ConcurrentHashMap<>();
+    private static final Object RUN_MONITOR = new Object();
 
-    public RunUtils() {
-        executor.prestartAllCoreThreads();
-    }
-
-    public static void runExistingDownstreamJobsOrCreateSiblings(Run run, List<LaunchModel> launchModelListToRunFrom) {
+    public static void runExistingDownstreamJobsOrCreateSiblings(Run run, TaskListener listener) {
         boolean isReportingMoreThanOnce = false;
-        List<LaunchModel> completeList = new ArrayList<>();
-        completeList.addAll(launchModelListToRunFrom);
-        completeList.addAll(getLaunchesFromRunnableList());
+        List<LaunchModel> completeList = Context.getAllRunningLaunches();
         List<JobModel> existingModels = ModelUtils.getDownStreamJobsFromModelsByName(completeList, getRunJobName(run));
-        int instanceCounter;
         for (JobModel jobModel : existingModels) {
-            if (!jobModel.isClone()) {
-                if (jobModel.getRpTestItemId() != null) { //is running
-                    if (!jobModel.getRun().getFullDisplayName().equals(run.getFullDisplayName()) && ModelUtils.haveSameParent(jobModel, run)) {
-                        instanceCounter = getRunningClones(jobModel).size() + 1;
-                        try {
-                            DownStreamJobModel newJobModel = (DownStreamJobModel) ((DownStreamJobModel) jobModel).clone();
-                            newJobModel.setRun(run);
-                            ((JobModel) jobModel.getParent()).addDownStreamJobModel(newJobModel);
-                            if (getRunJobName(newJobModel.getRun()).equals(getRunJobName(jobModel.getRun())) &&
-                                    newJobModel.getComposedName().equals(((DownStreamJobModel) jobModel).getComposedName())) {
-                                newJobModel.setRpTestItemName(newJobModel.getRpTestItemName() + String.format(" [%d]", instanceCounter));
-                            }
-                            createRunnableAndExecute(newJobModel, run);
-                        } catch (CloneNotSupportedException e) {
-                            LOGGER.error(String.format("Unable to clone test item with name '%s'.", jobModel.getRpTestItemName()));
+            if (!jobModel.isClone() && ModelUtils.haveTheSameParent(jobModel, run)) {
+                if (jobModel.getRpTestItemId() != null) {
+                    if (!jobModel.getRun().getFullDisplayName().equals(run.getFullDisplayName())) {
+                        JobModel clone = cloneModel(jobModel, run, listener);
+                        if (clone != null) {
+                            createRunnableAndExecute(clone, run);
                         }
                     }
                 } else {
                     jobModel.setRun(run);
+                    jobModel.setTaskListener(listener);
                     if (isReportingMoreThanOnce || isAlreadyRunningAsLaunch(jobModel, completeList)) {
-                        createRunnableAndExecute(jobModel, run);
+                        JobModel temp = jobModel;
+                        if (isModelWithTheSameNameAlreadyExistInParent(jobModel)) {
+                            temp = cloneModel(jobModel, run, listener);
+                        }
+                        if (temp != null) {
+                            createRunnableAndExecute(temp, run);
+                        }
                     } else {
+                        LOGGER.info(String.format("Starting Item '%s'. In thread '%s' / %s", jobModel.getComposedName(), Thread.currentThread().getName(), Thread.currentThread().getId()));
                         jobModel.start();
                         isReportingMoreThanOnce = true;
                     }
@@ -70,11 +54,40 @@ public class RunUtils {
         }
     }
 
+    private static boolean isModelWithTheSameNameAlreadyExistInParent(JobModel model) {
+        JobModel parent = (JobModel) model.getParent();
+        if (parent == null) {
+            return false;
+        }
+        for (JobModel childModel : parent.getDownStreamJobModelList()) {
+            if (childModel != model && childModel.getComposedName().equals(model.getComposedName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static JobModel cloneModel(JobModel source, Run run, TaskListener listener) {
+        try {
+            DownStreamJobModel newJobModel = (DownStreamJobModel) ((DownStreamJobModel) source).clone();
+            newJobModel.setRun(run);
+            newJobModel.setTaskListener(listener);
+            ((JobModel) source.getParent()).addDownStreamJobModel(newJobModel);
+            if (getRunJobName(newJobModel.getRun()).equals(getRunJobName(source.getRun())) && newJobModel.getComposedName().equals(source.getComposedName())) {
+                newJobModel.addNameAttribute(String.format(" [%d]", getRunningClones(source).size() + 1));
+            }
+            return newJobModel;
+        } catch (CloneNotSupportedException e) {
+            LOGGER.error(String.format("Unable to clone test item with name '%s'.", source.getRpTestItemName()));
+            return null;
+        }
+    }
+
     private static List<JobModel> getRunningClones(JobModel model) {
         List<JobModel> cloneList = new ArrayList<>();
-        JobModel parent = (JobModel)model.getParent();
-        for(JobModel jobModel : parent.getDownStreamJobModelList()) {
-            if(getRunJobName(model.getRun()).equals(getRunJobName(jobModel.getRun())) && jobModel.isClone()) {
+        JobModel parent = (JobModel) model.getParent();
+        for (JobModel jobModel : parent.getDownStreamJobModelList()) {
+            if (getRunJobName(model.getRun()).equals(getRunJobName(jobModel.getRun())) && jobModel.isClone()) {
                 cloneList.add(jobModel);
             }
         }
@@ -101,25 +114,35 @@ public class RunUtils {
     }
 
     private static void createRunnableAndExecute(ExecutableModel executable, Run run) {
-        RunnableModel runnable = new RunnableModel(executable, run);
-        executor.execute(runnable);
+        RunnableModel runnable = new RunnableModel(executable);
+        Context.getExecutor().execute(runnable);
+        synchronized (RUN_MONITOR) {
+            while (!runnable.isRunning()) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    LOGGER.error(e.getMessage());
+                }
+            }
+        }
+
         addNewRunnableModel(run, runnable);
     }
 
     private static void addNewRunnableModel(Run run, RunnableModel model) {
-        if (runnableModelMap.get(run) == null) {
+        if (Context.getRunnableModels(run) == null) {
             List<RunnableModel> emptyList = new ArrayList<>();
-            runnableModelMap.put(run, emptyList);
+            Context.addRunnableModels(run, emptyList);
         }
-        runnableModelMap.get(run).add(model);
+        Context.addRunnableModel(run, model);
     }
 
     private static void finishRunnableModel(Run run, ExecutableModel model) {
         List<RunnableModel> itemsToRemove = new ArrayList<>();
-        List<RunnableModel> list = runnableModelMap.get(run);
-        if (list != null) {
+        List<RunnableModel> runnableModelsList = Context.getRunnableModels(run);
+        if (runnableModelsList != null) {
             try {
-                for (RunnableModel runnable : runnableModelMap.get(run)) {
+                for (RunnableModel runnable : runnableModelsList) {
                     if (runnable.getModel().equals(model)) {
                         itemsToRemove.add(runnable);
                         while (!runnable.done()) {
@@ -132,35 +155,16 @@ public class RunUtils {
                     }
                 }
             } finally {
-                list.removeAll(itemsToRemove);
-                if (runnableModelMap.get(run) == null || runnableModelMap.get(run).isEmpty()) {
-                    runnableModelMap.remove(run);
+                runnableModelsList.removeAll(itemsToRemove);
+                if (Context.getRunnableModels(run) == null || Context.getRunnableModels(run).isEmpty()) {
+                    Context.removeRunnableModels(run);
                 }
             }
         }
     }
 
-    private static List<LaunchModel> getLaunchesFromRunnableList() {
-        Set<Run> list = runnableModelMap.keySet();
-        List<LaunchModel> launchList = new ArrayList<>();
-        if (!list.isEmpty()) {
-            for (Run runKey : runnableModelMap.keySet()) {
-                for (RunnableModel runnable : runnableModelMap.get(runKey)) {
-                    ExecutableModel model = runnable.getModel();
-                    if (model instanceof LaunchModel) {
-                        launchList.add((LaunchModel) model);
-                    }
-                }
-            }
-        }
-        return launchList;
-    }
-
-    public static void finishRunningDownStreamJobs(Run run, List<LaunchModel> launchModelListToRunFrom) {
-        List<LaunchModel> completeList = new ArrayList<>();
-        completeList.addAll(launchModelListToRunFrom);
-        completeList.addAll(getLaunchesFromRunnableList());
-        for (JobModel jobModel : ModelUtils.getDownStreamJobsFromModelsByName(completeList, getRunJobName(run))) {
+    public static void finishRunningDownStreamJobs(Run run) {
+        for (JobModel jobModel : ModelUtils.getDownStreamJobsFromModelsByName(Context.getAllRunningLaunches(), getRunJobName(run))) {
             if (run.equals(jobModel.getRun()) && jobModel.getRpTestItemId() != null) { //running
                 if (isRunnableModel(jobModel, run)) {
                     finishRunnableModel(run, jobModel);
@@ -172,7 +176,7 @@ public class RunUtils {
     }
 
     private static boolean isRunnableModel(ExecutableModel model, Run run) {
-        List<RunnableModel> list = runnableModelMap.get(run);
+        List<RunnableModel> list = Context.getRunnableModels(run);
         if (list != null) {
             for (RunnableModel runnable : list) {
                 if (runnable.getModel().equals(model)) {
@@ -186,7 +190,7 @@ public class RunUtils {
     public static void finishRunningLaunches(Run run, List<LaunchModel> launchesToFinish) {
         List<LaunchModel> completeList = new ArrayList<>();
         completeList.addAll(launchesToFinish);
-        completeList.addAll(getLaunchesFromRunnableList());
+        completeList.addAll(Context.getLaunchesFromRunnableList());
         try {
             for (LaunchModel model : completeList) {
                 if (run.equals(model.getRun()) && model.getLaunch() != null) {
@@ -198,21 +202,18 @@ public class RunUtils {
                 }
             }
         } finally {
-            runnableModelMap.remove(run);
+            Context.removeRunnableModels(run);
         }
-        LOGGER.error(String.format("Number of threads: %d", ManagementFactory.getThreadMXBean().getThreadCount()));
     }
 
-    public static List<LaunchModel> runNewLaunches(Run run, List<LaunchModel> runningLaunchesList, ConfigModel config) {
+    public static List<LaunchModel> runNewLaunches(Run run, TaskListener listener, ConfigModel config) {
         List<LaunchModel> newLaunchesToRun = new ArrayList<>();
-        List<LaunchModel> completeList = new ArrayList<>();
-        completeList.addAll(runningLaunchesList);
-        completeList.addAll(getLaunchesFromRunnableList());
         boolean hasSibling = false;
-        for (LaunchModel model : ModelUtils.getLaunchModelListToRun(run, config)) {
-            if (!isAlreadyRunningInList(model, completeList)) {
+        for (LaunchModel model : ModelUtils.getLaunchModelListToRun(run, listener, config)) {
+            if (!isAlreadyRunningInList(model, Context.getAllRunningLaunches())) {
                 if (model.isReportingEnabled()) {
-                    if (!hasSibling && !isAlreadyRunningAsItem(model, run, runningLaunchesList)) {
+                    if (!hasSibling && !isAlreadyRunningAsItem(model, run, Context.getRunningLaunches())) {
+                        LOGGER.info(String.format("Starting Launch '%s'. In thread '%s' / %s", model.getComposedName(), Thread.currentThread().getName(), Thread.currentThread().getId()));
                         model.start();
                         newLaunchesToRun.add(model);
                         hasSibling = true;
@@ -224,7 +225,6 @@ public class RunUtils {
         }
         return newLaunchesToRun;
     }
-
 
     public static String getRunJobName(Run run) {
         return run.getFullDisplayName().replace(run.getSearchName(), "").trim();

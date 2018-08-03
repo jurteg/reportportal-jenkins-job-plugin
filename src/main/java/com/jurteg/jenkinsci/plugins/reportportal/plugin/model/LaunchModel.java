@@ -5,6 +5,7 @@ import com.jurteg.jenkinsci.plugins.reportportal.plugin.utils.LaunchUtils;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.LaunchView;
 import com.jurteg.jenkinsci.plugins.reportportal.runtimeutils.JobNamingUtils;
 import hudson.model.Run;
+import hudson.model.TaskListener;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.HashSet;
@@ -18,32 +19,37 @@ public class LaunchModel implements ParentAware, ExecutableModel {
 
     private boolean reportingEnabled;
     private String name;
-    private String buildPattern;
     private String description;
     private String tags;
     private UpstreamJobModel upstreamJobModel;
     private ConfigModel config;
     private Run run;
+    private TaskListener listener;
     private ParentAware parent;
     private Launch launch;
+    private boolean useUpstreamJobName;
+
+    public LaunchModel(LaunchView launchView, Run run, TaskListener listener, ConfigModel config) {
+        this(launchView, run, config);
+        this.listener = listener;
+    }
 
     public LaunchModel(LaunchView launchView, Run run, ConfigModel config) {
+        this(launchView, run);
+        this.config = config;
+    }
+
+    public LaunchModel(LaunchView launchView, Run run) {
         this.name = launchView.getLaunchName();
         this.description = launchView.getLaunchDescription();
         this.tags = launchView.getTags();
         this.upstreamJobModel = new UpstreamJobModel(launchView.getUpStreamJobView(), this, run);
-        this.config = config;
         this.run = run;
         this.reportingEnabled = launchView.getEnableReporting();
-        this.buildPattern = launchView.getBuildPattern();
     }
 
     public ParentAware getParent() {
         return parent;
-    }
-
-    public String getBuildPattern() {
-        return buildPattern;
     }
 
     public void start() {
@@ -90,14 +96,17 @@ public class LaunchModel implements ParentAware, ExecutableModel {
     public String getComposedName() {
         StringBuilder builder = new StringBuilder();
         if(!StringUtils.isEmpty(name)) {
-            builder.append(name);
+            builder.append(JobNamingUtils.processEnvironmentVariables(run, listener, name));
         }else {
-            builder.append(upstreamJobModel.getJobName() + " Launch");
+            builder.append(upstreamJobModel.getComposedName());
         }
         builder.append(SPACE);
+
+       /*
         if(!StringUtils.isEmpty(buildPattern)) {
             builder.append(JobNamingUtils.getResultedString(run.getDisplayName(), buildPattern).replace(SPACE + SPACE, SPACE).trim());
         }
+        */
         return builder.toString();
     }
 

@@ -18,30 +18,21 @@ import java.util.List;
 
 public class DownStreamJobView extends AbstractDescribableImpl<DownStreamJobView> implements JobView {
 
-    private boolean enableReporting;
-    private String buildPattern;
     private String tags;
     private String description;
     private String parentJobTitle;
     private String jobToReportTitle;
     private String rpTestItemName;
     private List<DownStreamJobView> downStreamJobView;
-    private AdvancedNamingOptionsView advancedNamingOptions;
 
     @DataBoundConstructor
-    public DownStreamJobView(List<DownStreamJobView> downStreamJobView, String parentJobTitle, String jobToReportTitle, AdvancedNamingOptionsView advancedNamingOptions, String rpTestItemName, String tags, String description, boolean enableReporting) {
-        this.enableReporting = enableReporting;
+    public DownStreamJobView(List<DownStreamJobView> downStreamJobView, String parentJobTitle, String jobToReportTitle, String rpTestItemName, String tags, String description) {
         this.tags = tags;
         this.description = description;
         this.parentJobTitle = parentJobTitle;
         this.jobToReportTitle = jobToReportTitle;
-        this.advancedNamingOptions = advancedNamingOptions;
         this.rpTestItemName = rpTestItemName;
         this.downStreamJobView = downStreamJobView;
-    }
-
-    public AdvancedNamingOptionsView getAdvancedNamingOptions() {
-        return advancedNamingOptions;
     }
 
     public List<DownStreamJobView> getDownStreamJobView() {
@@ -66,14 +57,6 @@ public class DownStreamJobView extends AbstractDescribableImpl<DownStreamJobView
 
     public String getJobToReportTitle() {
         return jobToReportTitle;
-    }
-
-    public boolean getEnableReporting() {
-        return enableReporting;
-    }
-
-    public void setEnableReporting(boolean enableReporting) {
-        this.enableReporting = enableReporting;
     }
 
     public String getTags() {

@@ -19,23 +19,15 @@ public class UpStreamJobView extends AbstractDescribableImpl<UpStreamJobView> im
     private String rpTestItemName;
     private String tags;
     private String description;
-    private boolean enableReporting;
     private List<DownStreamJobView> downStreamJobView;
-    private AdvancedNamingOptionsView advancedNamingOptions;
 
     @DataBoundConstructor
-    public UpStreamJobView(List<DownStreamJobView> downStreamJobView, String rpTestItemName, String jobToReportTitle, AdvancedNamingOptionsView advancedNamingOptions, String description, boolean enableReporting, String tags) {
+    public UpStreamJobView(List<DownStreamJobView> downStreamJobView, String rpTestItemName, String jobToReportTitle, String description, String tags) {
         this.rpTestItemName = rpTestItemName;
         this.jobToReportTitle = jobToReportTitle;
-        this.advancedNamingOptions = advancedNamingOptions;
         this.description = description;
-        this.enableReporting = enableReporting;
         this.tags = tags;
         this.downStreamJobView = downStreamJobView;
-    }
-
-    public AdvancedNamingOptionsView getAdvancedNamingOptions() {
-        return advancedNamingOptions;
     }
 
     @Override
@@ -80,14 +72,6 @@ public class UpStreamJobView extends AbstractDescribableImpl<UpStreamJobView> im
 
     public void setDownStreamJobView(List<DownStreamJobView> downStreamJobView) {
         this.downStreamJobView = downStreamJobView;
-    }
-
-    public boolean getEnableReporting() {
-        return enableReporting;
-    }
-
-    public void setEnableReporting(boolean enableReporting) {
-        this.enableReporting = enableReporting;
     }
 
     public String getTags() {
@@ -142,25 +126,6 @@ public class UpStreamJobView extends AbstractDescribableImpl<UpStreamJobView> im
         public FormValidation doCheckTags(@QueryParameter String tags) {
             return FormValidation.okWithMarkup("<i>NOTE: use semicolon for separating tags.</i>");
         }
-
-
-
-
-
-        /*
-        public ListBoxModel doFillJobToReportTitleItems() {
-            ListBoxModel jenkinsJobList = new ListBoxModel(getJobOptions());
-            return jenkinsJobList;
-        }
-
-        private List<ListBoxModel.Option> getJobOptions() {
-            List<ListBoxModel.Option> jobNameList = new ArrayList<>();
-            for (String job : JenkinsJobUtils.getJenkinsJobNamesList()) {
-                jobNameList.add(new ListBoxModel.Option(job.trim()));
-            }
-            return jobNameList;
-        }
-        */
 
     }
 }

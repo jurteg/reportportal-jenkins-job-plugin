@@ -16,12 +16,11 @@
             <f:entry title="Downstream job display name" field="rpTestItemName">
                 <f:textbox/>
             </f:entry>
-            <f:entry>
-                <f:optionalProperty field="advancedNamingOptions" title="Advanced naming"/>
-            </f:entry>
+
             <f:entry title="Downstream job description" field="description">
                 <f:textarea/>
             </f:entry>
+
             <f:entry title="Downstream job tags" field="tags">
                 <f:textbox/>
             </f:entry>

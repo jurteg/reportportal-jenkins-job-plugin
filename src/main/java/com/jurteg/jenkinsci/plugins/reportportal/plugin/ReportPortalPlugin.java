@@ -24,7 +24,7 @@ public final class ReportPortalPlugin extends AbstractDescribableImpl<ReportPort
 
     private static Logger LOGGER = LoggerFactory.getLogger(ReportPortalPlugin.class);
 
-    private final static String CONFIG_FILE = "rpconfig.xml";
+    private final static String CONFIG_FILE = "com.jurteg.jenkinsci.plugins.reportportal.Configuration.xml";
     private final static String VERSION = "application.version";
     private GeneralView generalView;
     private String version;

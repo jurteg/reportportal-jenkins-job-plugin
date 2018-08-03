@@ -2,10 +2,9 @@ package com.jurteg.jenkinsci.plugins.reportportal.plugin.model;
 
 import com.epam.reportportal.service.Launch;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.utils.LaunchUtils;
-import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.AdvancedNamingOptionsView;
-import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.JobView;
 import com.jurteg.jenkinsci.plugins.reportportal.runtimeutils.JobNamingUtils;
 import hudson.model.Run;
+import hudson.model.TaskListener;
 import io.reactivex.Maybe;
 import org.apache.commons.lang.StringUtils;
 
@@ -19,9 +18,9 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
 
     private static final String SEMICOLON = ";";
     private static final String SPACE = " ";
+    protected List<String> nameAttributesList = new ArrayList<>();
 
     protected String jobName;
-    protected String buildPattern;
     protected String description;
     protected String tags;
     protected List<DownStreamJobModel> downStreamJobModelList;
@@ -29,6 +28,7 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
     protected ParentAware parent;
     protected Maybe<String> rpTestItemId;
     protected Run run;
+    protected TaskListener listener;
     protected Maybe<String> jobLogItemId;
     protected boolean isClone;
 
@@ -45,10 +45,8 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
     }
 
     protected void startLogItem() {
-        String tempName = StringUtils.isEmpty(rpTestItemName) ? jobName : rpTestItemName;
-        String description = "Console Log";
-        String name = tempName + SPACE + description;
-        jobLogItemId = LaunchUtils.startTestItem(getLaunch().getLaunch(), rpTestItemId, name, description, null, "STEP");
+        String name = "Console Log";
+        jobLogItemId = LaunchUtils.startTestItem(getLaunch().getLaunch(), rpTestItemId, name, name, null, "STEP");
     }
 
     @Override
@@ -87,8 +85,14 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
         return run;
     }
 
+    @Override
     public void setRun(Run run) {
         this.run = run;
+    }
+
+    @Override
+    public void setTaskListener(TaskListener listener) {
+        this.listener = listener;
     }
 
     @Override
@@ -100,22 +104,36 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
     }
 
     @Override
-    public String getBuildPattern() {
-        return buildPattern;
+    public void resolveBaseName() {
+        if (!StringUtils.isEmpty(rpTestItemName)) {
+            nameAttributesList.add(rpTestItemName);
+        } else {
+            nameAttributesList.add(jobName);
+        }
     }
 
     public String getComposedName() {
+        return JobNamingUtils.processEnvironmentVariables(run, listener, composeNameFromAttributeList());
+    }
+
+    public String getComposedDescription() {
+        return JobNamingUtils.processEnvironmentVariables(run, listener, description);
+    }
+
+    public void setNameAttributesList(List<String> nameAttributesList) {
+        this.nameAttributesList = nameAttributesList;
+    }
+
+    public void addNameAttribute(String attribute) {
+        nameAttributesList.add(attribute);
+    }
+
+    private String composeNameFromAttributeList() {
         StringBuilder builder = new StringBuilder();
-        if(!StringUtils.isEmpty(rpTestItemName)) {
-            builder.append(rpTestItemName);
-        } else {
-            builder.append(jobName);
+        for (String string : nameAttributesList) {
+            builder.append(string).append(SPACE);
         }
-        builder.append(SPACE);
-        if(!StringUtils.isEmpty(buildPattern)) {
-            builder.append(JobNamingUtils.getResultedString(run.getDisplayName(), buildPattern).replace(SPACE + SPACE, SPACE).trim());
-        }
-        return builder.toString();
+        return builder.toString().replace(SPACE + SPACE, SPACE).trim();
     }
 
     @Override
@@ -196,14 +214,17 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
         List<DownStreamJobModel> modelList = new ArrayList<>();
         newModel.setRpTestItemId(null);
         newModel.setRun(null);
+        newModel.setTaskListener(null);
         newModel.setJobLogItemId(null);
         newModel.setIsClone(true);
-        if(getDownStreamJobModelList() != null) {
+        newModel.setNameAttributesList(new ArrayList<>());
+        newModel.resolveBaseName();
+        if (getDownStreamJobModelList() != null) {
             for (DownStreamJobModel model : getDownStreamJobModelList()) {
                 modelList.add((DownStreamJobModel) model.clone());
             }
         }
-        if(!modelList.isEmpty()) {
+        if (!modelList.isEmpty()) {
             newModel.setDownStreamJobModelList(modelList);
         }
         return newModel;
@@ -211,20 +232,12 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
 
     protected Set<String> processTags(String delimitedString) {
         Set<String> tags = new HashSet<>();
-        if(delimitedString != null) {
+        if (delimitedString != null) {
             for (String tag : delimitedString.split(SEMICOLON)) {
-                tags.add(tag);
+                tags.add(JobNamingUtils.processEnvironmentVariables(run, listener, tag));
             }
         }
         return tags;
-    }
-
-    protected String getBuildPatternFromView(JobView view) {
-        AdvancedNamingOptionsView options = view.getAdvancedNamingOptions();
-        if(options != null) {
-            return options.getBuildPattern();
-        }
-        return null;
     }
 
 }
