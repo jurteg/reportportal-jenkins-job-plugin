@@ -1,0 +1,38 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+
+    <f:section title="Downstream job view settings">
+        <f:block>
+            <f:entry title="Upstream job" field="parentJobTitle">
+                <f:textbox/>
+            </f:entry>
+
+            <f:entry title="Downstream job" field="jobToReportTitle">
+                <f:textbox/>
+            </f:entry>
+
+        </f:block>
+        <f:block>
+            <f:entry title="Downstream job display name" field="rpTestItemName">
+                <f:textbox/>
+            </f:entry>
+
+            <f:entry title="Downstream job description" field="description">
+                <f:textarea/>
+            </f:entry>
+
+            <f:entry title="Downstream job tags" field="tags">
+                <f:textbox/>
+            </f:entry>
+        </f:block>
+    </f:section>
+
+    <f:section title="">
+        <f:block>
+            <f:entry>
+                <f:repeatableHeteroProperty addCaption="Add Downstream job under Downstream job" field="downStreamJobView"/>
+            </f:entry>
+        </f:block>
+    </f:section>
+
+</j:jelly>

@@ -10,7 +10,7 @@
         <relativePath/>
     </parent>
     <artifactId>report-portal-job-reporter</artifactId>
-    <version>1.00</version>
+    <version>2.0.12</version>
     <packaging>hpi</packaging>
 
     <properties>
@@ -59,7 +59,6 @@
         </pluginRepository>
     </pluginRepositories>
     <dependencies>
-
         <dependency>
             <groupId>com.epam.reportportal</groupId>
             <artifactId>client-java</artifactId>
@@ -76,6 +75,13 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources/properties</directory>
+                <includes>
+                    <include>properties.properties</include>
+                </includes>
+                <filtering>true</filtering>
             </resource>
             <resource><!-- copy all Java source files as resources -->
                 <directory>src/main/java</directory>

@@ -1,0 +1,18 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+
+    <f:section title="">
+        <f:block>
+            <f:entry title="RP Server Address" field="endpoint">
+                <f:textbox/>
+            </f:entry>
+            <f:entry title="RP Project Name" field="project">
+                <f:textbox/>
+            </f:entry>
+            <f:entry title="UUID" field="uuid">
+                <f:password/>
+            </f:entry>
+        </f:block>
+    </f:section>
+
+</j:jelly>

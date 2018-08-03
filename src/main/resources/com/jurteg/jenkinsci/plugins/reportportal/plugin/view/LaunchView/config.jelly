@@ -1,0 +1,39 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core"
+         xmlns:f="/lib/form"
+>
+
+
+    <f:section title="Launch settings">
+        <f:block>
+            <f:checkbox field="enableReporting" title="Enable reporting for this Launch" checked="${it.enableReporting}"/>
+        </f:block>
+
+        <f:block>
+            <f:optionalProperty field="config" title="Override general RP configuration"/>
+        </f:block>
+
+        <f:section title="">
+            <f:block>
+                <f:entry title="Launch name" field="launchName">
+                    <f:textbox/>
+                </f:entry>
+
+                <f:entry title="Launch description" field="launchDescription">
+                    <f:textarea/>
+                </f:entry>
+
+                <f:entry title="Launch tags" field="tags">
+                    <f:textbox/>
+                </f:entry>
+            </f:block>
+        </f:section>
+    </f:section>
+
+
+    <f:block>
+        <f:property field="upStreamJobView"/>
+    </f:block>
+
+
+</j:jelly>
