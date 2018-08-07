@@ -15,7 +15,6 @@ import java.util.Set;
 public class LaunchModel implements ParentAware, ExecutableModel {
 
     private static final String SEMICOLON = ";";
-    private static final String SPACE = " ";
 
     private boolean reportingEnabled;
     private String name;
@@ -27,7 +26,6 @@ public class LaunchModel implements ParentAware, ExecutableModel {
     private TaskListener listener;
     private ParentAware parent;
     private Launch launch;
-    private boolean useUpstreamJobName;
 
     public LaunchModel(LaunchView launchView, Run run, TaskListener listener, ConfigModel config) {
         this(launchView, run, config);
@@ -95,18 +93,11 @@ public class LaunchModel implements ParentAware, ExecutableModel {
 
     public String getComposedName() {
         StringBuilder builder = new StringBuilder();
-        if(!StringUtils.isEmpty(name)) {
+        if (!StringUtils.isEmpty(name)) {
             builder.append(JobNamingUtils.processEnvironmentVariables(run, listener, name));
-        }else {
+        } else {
             builder.append(upstreamJobModel.getComposedName());
         }
-        builder.append(SPACE);
-
-       /*
-        if(!StringUtils.isEmpty(buildPattern)) {
-            builder.append(JobNamingUtils.getResultedString(run.getDisplayName(), buildPattern).replace(SPACE + SPACE, SPACE).trim());
-        }
-        */
         return builder.toString();
     }
 
