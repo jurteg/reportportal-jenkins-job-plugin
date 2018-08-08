@@ -36,6 +36,10 @@ public final class ConfigView extends AbstractDescribableImpl<ConfigView> {
         this.endpoint = endpoint;
     }
 
+    public boolean isSet() {
+        return uuid != null && project != null && endpoint != null;
+    }
+
     @DataBoundConstructor
     public ConfigView(String endpoint, String uuid, String project) {
         this.endpoint = endpoint;

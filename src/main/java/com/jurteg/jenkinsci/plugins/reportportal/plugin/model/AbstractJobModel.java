@@ -206,7 +206,7 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(jobName, description, tags, downStreamJobModelList, rpTestItemName, parent, run);
+        return Objects.hash(jobName, description, tags, downStreamJobModelList, rpTestItemName, listener, run);
     }
 
     public Object clone() throws CloneNotSupportedException {

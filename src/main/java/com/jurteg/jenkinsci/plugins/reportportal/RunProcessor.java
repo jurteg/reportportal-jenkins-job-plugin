@@ -21,13 +21,13 @@ public class RunProcessor {
     public static void onStarted(Run run, TaskListener listener) {
         if (UiUtils.getGeneralView() != null) {
             ConfigView configView = UiUtils.getGeneralView().getConfig();
-            if (configView != null) {
+            //if (configView != null) {
                 ConfigModel config = new ConfigModel(configView);
                 synchronized (EXISTING_LAUNCH_MODEL_MONITOR) {
                     RunUtils.runExistingDownstreamJobsOrCreateSiblings(run, listener);
                     runLaunches(run, listener, config);
                 }
-            }
+            //}
         }
     }
 

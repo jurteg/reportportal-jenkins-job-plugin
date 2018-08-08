@@ -34,7 +34,11 @@ public class LaunchModel implements ParentAware, ExecutableModel {
 
     public LaunchModel(LaunchView launchView, Run run, ConfigModel config) {
         this(launchView, run);
-        this.config = config;
+        if(launchView.getConfig() != null) {
+            this.config = new ConfigModel(launchView.getConfig());
+        } else {
+            this.config = config;
+        }
     }
 
     public LaunchModel(LaunchView launchView, Run run) {
@@ -53,6 +57,9 @@ public class LaunchModel implements ParentAware, ExecutableModel {
     public void start() {
         if (launch != null) {
             throw new IllegalStateException("Attempting to start already running Launch Model: " + toString());
+        }
+        if(config == null || !config.isSet()) {
+            throw new IllegalStateException("RP credentials aren't set or incomplete for Launch: " + toString());
         }
         launch = LaunchUtils.startLaunch(config, getComposedName(), description, processTags(tags));
         upstreamJobModel.start();
@@ -131,7 +138,7 @@ public class LaunchModel implements ParentAware, ExecutableModel {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, tags, upstreamJobModel, run);
+        return Objects.hash(name, description, tags, config, listener, run);
     }
 
     @Override
