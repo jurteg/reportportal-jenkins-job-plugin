@@ -9,9 +9,11 @@ public class ConfigModel {
     private String endpoint;
 
     public ConfigModel(ConfigView config) {
-        this.uuid = config.getUuid();
-        this.project = config.getProject();
-        this.endpoint = config.getEndpoint();
+        if(config != null) {
+            this.uuid = config.getUuid();
+            this.project = config.getProject();
+            this.endpoint = config.getEndpoint();
+        }
     }
 
     public String getUuid() {
@@ -24,5 +26,9 @@ public class ConfigModel {
 
     public String getEndpoint() {
         return endpoint;
+    }
+
+    public boolean isSet() {
+        return uuid != null && project != null && endpoint != null;
     }
 }

@@ -15,7 +15,6 @@ import java.util.Set;
 public class LaunchModel implements ParentAware, ExecutableModel {
 
     private static final String SEMICOLON = ";";
-    private static final String SPACE = " ";
 
     private boolean reportingEnabled;
     private String name;
@@ -27,7 +26,6 @@ public class LaunchModel implements ParentAware, ExecutableModel {
     private TaskListener listener;
     private ParentAware parent;
     private Launch launch;
-    private boolean useUpstreamJobName;
 
     public LaunchModel(LaunchView launchView, Run run, TaskListener listener, ConfigModel config) {
         this(launchView, run, config);
@@ -36,7 +34,11 @@ public class LaunchModel implements ParentAware, ExecutableModel {
 
     public LaunchModel(LaunchView launchView, Run run, ConfigModel config) {
         this(launchView, run);
-        this.config = config;
+        if(launchView.getConfig() != null) {
+            this.config = new ConfigModel(launchView.getConfig());
+        } else {
+            this.config = config;
+        }
     }
 
     public LaunchModel(LaunchView launchView, Run run) {
@@ -55,6 +57,9 @@ public class LaunchModel implements ParentAware, ExecutableModel {
     public void start() {
         if (launch != null) {
             throw new IllegalStateException("Attempting to start already running Launch Model: " + toString());
+        }
+        if(config == null || !config.isSet()) {
+            throw new IllegalStateException("RP credentials aren't set or incomplete for Launch: " + toString());
         }
         launch = LaunchUtils.startLaunch(config, getComposedName(), description, processTags(tags));
         upstreamJobModel.start();
@@ -95,18 +100,11 @@ public class LaunchModel implements ParentAware, ExecutableModel {
 
     public String getComposedName() {
         StringBuilder builder = new StringBuilder();
-        if(!StringUtils.isEmpty(name)) {
+        if (!StringUtils.isEmpty(name)) {
             builder.append(JobNamingUtils.processEnvironmentVariables(run, listener, name));
-        }else {
+        } else {
             builder.append(upstreamJobModel.getComposedName());
         }
-        builder.append(SPACE);
-
-       /*
-        if(!StringUtils.isEmpty(buildPattern)) {
-            builder.append(JobNamingUtils.getResultedString(run.getDisplayName(), buildPattern).replace(SPACE + SPACE, SPACE).trim());
-        }
-        */
         return builder.toString();
     }
 
@@ -140,7 +138,7 @@ public class LaunchModel implements ParentAware, ExecutableModel {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, tags, upstreamJobModel, run);
+        return Objects.hash(name, description, tags, config, listener, run);
     }
 
     @Override

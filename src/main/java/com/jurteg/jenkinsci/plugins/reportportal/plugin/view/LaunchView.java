@@ -10,28 +10,20 @@ import org.kohsuke.stapler.QueryParameter;
 public class LaunchView extends AbstractDescribableImpl<LaunchView> {
 
     private String launchName;
-    private String buildPattern;
     private String tags;
     private String launchDescription;
     private boolean enableReporting;
-    private boolean useUpstreamJobName;
     private final ConfigView config;
     private UpStreamJobView upStreamJobView;
 
     @DataBoundConstructor
-    public LaunchView(UpStreamJobView upStreamJobView, ConfigView config, String launchName, String buildPattern, String tags, String launchDescription, boolean enableReporting, boolean useUpstreamJobName) {
+    public LaunchView(UpStreamJobView upStreamJobView, ConfigView config, String launchName, String tags, String launchDescription, boolean enableReporting) {
         this.config = config;
         this.launchName = launchName;
-        this.buildPattern = buildPattern;
         this.tags = tags;
         this.launchDescription = launchDescription;
         this.enableReporting = enableReporting;
         this.upStreamJobView = upStreamJobView;
-        this.useUpstreamJobName = useUpstreamJobName;
-    }
-
-    public String getBuildPattern() {
-        return buildPattern;
     }
 
     public boolean getEnableReporting() {
@@ -87,14 +79,14 @@ public class LaunchView extends AbstractDescribableImpl<LaunchView> {
         }
 
         public FormValidation doCheckLaunchName(@QueryParameter String launchName) {
-            if(launchName.isEmpty()) {
-                return FormValidation.warning("WARNING: Launch name is blank and will be filled with corresponding Multijob name.");
+            if (launchName.isEmpty()) {
+                return FormValidation.warning("WARNING: Launch name is blank and will be filled with corresponding Multijob(Upstream) name.");
             }
             return FormValidation.ok();
         }
 
         public FormValidation doCheckLaunchDescription(@QueryParameter String launchDescription) {
-           return FormValidation.okWithMarkup("<i>NOTE: the description section on RP supports markdown, so you could format your text.</i>");
+            return FormValidation.okWithMarkup("<i>NOTE: the description section on RP supports markdown, so you could format your text.</i>");
         }
 
         public FormValidation doCheckTags(@QueryParameter String tags) {
