@@ -6,8 +6,10 @@ import com.jurteg.jenkinsci.plugins.reportportal.runtime.ReporterThreadFactory;
 import com.jurteg.jenkinsci.plugins.reportportal.runtime.RunnableModel;
 import hudson.model.Run;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,9 +17,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import hudson.EnvVars;
+import hudson.model.TaskListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Context {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(Context.class);
+    private static Map<Run, EnvVars> envVarsMap = new HashMap<>();
     private static List<LaunchModel> runningLaunchModelList = Collections.synchronizedList(new ArrayList<>());
     private static Map<Run, List<RunnableModel>> runnableModelMap = new ConcurrentHashMap<>();
     private static ThreadPoolExecutor executor = new ThreadPoolExecutor(10, 20, 5, TimeUnit.HOURS,
@@ -80,6 +88,22 @@ public class Context {
             }
         }
         return launchList;
+    }
+
+    public static void setEnvVars(Run run, TaskListener listener) {
+        try {
+            envVarsMap.put(run, new EnvVars(run.getEnvironment(listener)));
+        }catch (IOException | InterruptedException e) {
+            LOGGER.error(e.getMessage());
+        }
+    }
+
+    public static EnvVars getEnvVars(Run run) {
+        return envVarsMap.get(run);
+    }
+
+    public static void removeEnvVars(Run run) {
+        envVarsMap.remove(run);
     }
 
 }

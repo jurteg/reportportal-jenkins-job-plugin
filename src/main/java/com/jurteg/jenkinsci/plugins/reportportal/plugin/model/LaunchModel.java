@@ -7,6 +7,7 @@ import com.jurteg.jenkinsci.plugins.reportportal.runtimeutils.JobNamingUtils;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import org.apache.commons.lang.StringUtils;
+import rp.com.google.common.base.Supplier;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -61,8 +62,9 @@ public class LaunchModel implements ParentAware, ExecutableModel {
         if(config == null || !config.isSet()) {
             throw new IllegalStateException("RP credentials aren't set or incomplete for Launch: " + toString());
         }
-        launch = LaunchUtils.startLaunch(config, getComposedName(), description, processTags(tags));
+        launch = LaunchUtils.startLaunch(config, getComposedName(), upstreamJobModel.getComposedDescription(description), upstreamJobModel.processTags(tags));
         upstreamJobModel.start();
+
     }
 
     public void finish() {
@@ -101,7 +103,7 @@ public class LaunchModel implements ParentAware, ExecutableModel {
     public String getComposedName() {
         StringBuilder builder = new StringBuilder();
         if (!StringUtils.isEmpty(name)) {
-            builder.append(JobNamingUtils.processEnvironmentVariables(run, listener, name));
+            builder.append(JobNamingUtils.processEnvironmentVariables(upstreamJobModel.getRun(), name));
         } else {
             builder.append(upstreamJobModel.getComposedName());
         }
@@ -154,13 +156,4 @@ public class LaunchModel implements ParentAware, ExecutableModel {
                 Objects.equals(run, other.run);
     }
 
-    protected Set<String> processTags(String delimitedString) {
-        Set<String> tags = new HashSet<>();
-        if (delimitedString != null) {
-            for (String tag : delimitedString.split(SEMICOLON)) {
-                tags.add(tag);
-            }
-        }
-        return tags;
-    }
 }

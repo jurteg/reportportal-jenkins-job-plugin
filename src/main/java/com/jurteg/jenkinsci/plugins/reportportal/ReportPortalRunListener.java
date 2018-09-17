@@ -12,12 +12,14 @@ public class ReportPortalRunListener extends RunListener<Run> {
 
     @Override
     public void onStarted(Run run, TaskListener listener) {
+        Context.setEnvVars(run, listener);
         RunProcessor.onStarted(run, listener);
     }
 
     @Override
     public void onCompleted(Run run, @Nonnull TaskListener listener) {
         RunProcessor.onCompleted(run);
+        Context.removeEnvVars(run);
     }
 
 }

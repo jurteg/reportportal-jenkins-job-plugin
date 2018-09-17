@@ -46,7 +46,7 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
 
     protected void startLogItem() {
         String name = "Console Log";
-        jobLogItemId = LaunchUtils.startTestItem(getLaunch().getLaunch(), rpTestItemId, name, name, null, "STEP");
+        jobLogItemId = LaunchUtils.startTestItem(getLaunchModel().getLaunch(), rpTestItemId, name, name, null, "STEP");
     }
 
     @Override
@@ -61,7 +61,7 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
 
     @Override
     public void finish() {
-        Launch rpLaunch = getLaunch().getLaunch();
+        Launch rpLaunch = getLaunchModel().getLaunch();
         LaunchUtils.finishTestItem(rpLaunch, jobLogItemId, run);
         LaunchUtils.finishTestItem(rpLaunch, rpTestItemId, run, false);
     }
@@ -72,7 +72,7 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
     }
 
     @Override
-    public LaunchModel getLaunch() {
+    public LaunchModel getLaunchModel() {
         ParentAware parent = getParent();
         while (!(parent instanceof LaunchModel)) {
             parent = parent.getParent();
@@ -113,11 +113,11 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
     }
 
     public String getComposedName() {
-        return JobNamingUtils.processEnvironmentVariables(run, listener, composeNameFromAttributeList());
+        return JobNamingUtils.processEnvironmentVariables(run, composeNameFromAttributeList());
     }
 
-    public String getComposedDescription() {
-        return JobNamingUtils.processEnvironmentVariables(run, listener, description);
+    public String getComposedDescription(String description) {
+        return JobNamingUtils.processEnvironmentVariables(run, description);
     }
 
     public void setNameAttributesList(List<String> nameAttributesList) {
@@ -234,7 +234,7 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
         Set<String> tags = new HashSet<>();
         if (delimitedString != null) {
             for (String tag : delimitedString.split(SEMICOLON)) {
-                tags.add(JobNamingUtils.processEnvironmentVariables(run, listener, tag));
+                tags.add(JobNamingUtils.processEnvironmentVariables(run, tag));
             }
         }
         return tags;

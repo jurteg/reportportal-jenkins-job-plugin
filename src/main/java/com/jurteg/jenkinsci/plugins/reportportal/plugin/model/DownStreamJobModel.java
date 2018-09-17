@@ -18,14 +18,26 @@ public class DownStreamJobModel extends AbstractJobModel {
 
     @Override
     public void start() {
+        pushParent();
         if (rpTestItemId != null) {
             throw new IllegalStateException("Attempting to start already running RP item: " + rpTestItemId.blockingGet());
         }
-        if (((JobModel) this.parent).getRpTestItemId() == null) {
+        if (((JobModel) parent).getRpTestItemId() == null) {
             throw new IllegalStateException(String.format("Unable to run RP item for job model '%s' because parent item '%s' is not running.", toString(), parent.toString()));
         }
-        rpTestItemId = LaunchUtils.startTestItem(getLaunch().getLaunch(), ((JobModel) this.parent).getRpTestItemId(), getComposedName(), getComposedDescription(), processTags(tags), getTestItemType());
+        rpTestItemId = LaunchUtils.startTestItem(getLaunchModel().getLaunch(), ((JobModel) parent).getRpTestItemId(), getComposedName(), getComposedDescription(description), processTags(tags), getTestItemType());
         startLogItem();
+    }
+
+    private void pushParent() {
+        ParentAware parent = super.getParent();
+        if (parent instanceof UpstreamJobModel) {
+            UpstreamJobModel model = ((UpstreamJobModel) parent);
+            if (model.isSuspending()) {
+                model.isSuspending(false);
+                model.start();
+            }
+        }
     }
 
     public String getTestItemType() {

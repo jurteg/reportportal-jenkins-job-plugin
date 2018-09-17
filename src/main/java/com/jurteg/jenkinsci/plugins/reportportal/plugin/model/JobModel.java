@@ -42,7 +42,7 @@ public interface JobModel extends ParentAware, ExecutableModel {
 
     void start(Run run);
 
-    LaunchModel getLaunch();
+    LaunchModel getLaunchModel();
 
     String getTestItemType();
 

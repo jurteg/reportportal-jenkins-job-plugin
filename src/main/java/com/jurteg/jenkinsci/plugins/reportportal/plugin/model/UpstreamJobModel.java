@@ -8,6 +8,8 @@ import java.util.Objects;
 
 public class UpstreamJobModel extends AbstractJobModel {
 
+    private boolean isSuspending;
+
     public UpstreamJobModel(UpStreamJobView view, ParentAware parent, Run run) {
         this.jobName = view.getJobToReportTitle();
         this.description = view.getDescription();
@@ -17,6 +19,14 @@ public class UpstreamJobModel extends AbstractJobModel {
         this.parent = parent;
         this.run = run;
         resolveBaseName();
+    }
+
+    public boolean isSuspending() {
+        return isSuspending;
+    }
+
+    public void isSuspending(boolean isSuspending) {
+        this.isSuspending = isSuspending;
     }
 
     @Override
@@ -32,7 +42,7 @@ public class UpstreamJobModel extends AbstractJobModel {
         if (((LaunchModel) getParent()).getLaunch() == null) {
             throw new IllegalStateException(String.format("Unable to run RP item for job model '%s' because parent item '%s' is not running.", toString(), parent.toString()));
         }
-        rpTestItemId = LaunchUtils.startTestItem(((LaunchModel) parent).getLaunch(), null, getComposedName(), getComposedDescription(), processTags(tags), getTestItemType());
+        rpTestItemId = LaunchUtils.startTestItem(((LaunchModel) parent).getLaunch(), null, getComposedName(), getComposedDescription(description), processTags(tags), getTestItemType());
         startLogItem();
     }
 
