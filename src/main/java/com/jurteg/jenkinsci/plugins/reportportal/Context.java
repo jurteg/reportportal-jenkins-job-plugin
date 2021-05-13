@@ -2,6 +2,7 @@ package com.jurteg.jenkinsci.plugins.reportportal;
 
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.ExecutableModel;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.model.LaunchModel;
+import com.jurteg.jenkinsci.plugins.reportportal.plugin.utils.LaunchUtils;
 import com.jurteg.jenkinsci.plugins.reportportal.runtime.ReporterThreadFactory;
 import com.jurteg.jenkinsci.plugins.reportportal.runtime.RunnableModel;
 import hudson.model.Run;
@@ -30,6 +31,14 @@ public class Context {
     private static Map<Run, List<RunnableModel>> runnableModelMap = new ConcurrentHashMap<>();
     private static ThreadPoolExecutor executor = new ThreadPoolExecutor(10, 20, 5, TimeUnit.HOURS,
             new LinkedBlockingQueue<>(), new ReporterThreadFactory());
+    private static LaunchUtils launchUtils;
+
+    public static LaunchUtils launchUtils() {
+        if(launchUtils == null) {
+            launchUtils = new LaunchUtils();
+        }
+        return launchUtils;
+    }
 
     public static ThreadPoolExecutor getExecutor() {
         return executor;

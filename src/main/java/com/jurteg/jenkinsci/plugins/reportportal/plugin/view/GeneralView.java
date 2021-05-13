@@ -15,6 +15,15 @@ public class GeneralView extends AbstractDescribableImpl<GeneralView> {
 
     private final ConfigView config;
     private final List<LaunchView> entries;
+    private boolean enableReporting;
+
+    public boolean getEnableReporting() {
+        return enableReporting;
+    }
+
+    public void setEnableReporting(boolean enableReporting) {
+        this.enableReporting = enableReporting;
+    }
 
     public List<LaunchView> getEntries() {
         return Collections.unmodifiableList(entries);
@@ -29,16 +38,17 @@ public class GeneralView extends AbstractDescribableImpl<GeneralView> {
     }
 
     @DataBoundConstructor
-    public GeneralView(ConfigView config, List<LaunchView> entries) {
+    public GeneralView(ConfigView config, List<LaunchView> entries, boolean enableReporting) {
         this.config = config;
-        this.entries = entries != null ? new ArrayList<>(entries) : Collections.<LaunchView>emptyList();
+        this.entries = entries != null ? new ArrayList<>(entries) : Collections.emptyList();
+        this.enableReporting = enableReporting;
     }
 
     @Extension
     public static class DescriptorImpl extends Descriptor<GeneralView> {
 
         public List<Descriptor> getEntriesDescriptors() {
-            Jenkins jenkins = Jenkins.getInstance();
+            Jenkins jenkins = Jenkins.get();
             return ImmutableList.of(jenkins.getDescriptor(LaunchView.class));
         }
 

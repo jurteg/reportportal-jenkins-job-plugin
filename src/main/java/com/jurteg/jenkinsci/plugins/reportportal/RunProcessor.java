@@ -19,7 +19,7 @@ public class RunProcessor {
 
 
     public static void onStarted(Run run, TaskListener listener) {
-        if (UiUtils.getGeneralView() != null) {
+        if (UiUtils.getGeneralView() != null && UiUtils.getGeneralView().getEnableReporting()) {
             ConfigView configView = UiUtils.getGeneralView().getConfig();
             //if (configView != null) {
                 ConfigModel config = new ConfigModel(configView);

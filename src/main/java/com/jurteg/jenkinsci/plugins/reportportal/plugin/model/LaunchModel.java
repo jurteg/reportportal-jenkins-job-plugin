@@ -1,17 +1,14 @@
 package com.jurteg.jenkinsci.plugins.reportportal.plugin.model;
 
 import com.epam.reportportal.service.Launch;
-import com.jurteg.jenkinsci.plugins.reportportal.plugin.utils.LaunchUtils;
+import com.jurteg.jenkinsci.plugins.reportportal.Context;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.LaunchView;
 import com.jurteg.jenkinsci.plugins.reportportal.runtimeutils.JobNamingUtils;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import org.apache.commons.lang.StringUtils;
-import rp.com.google.common.base.Supplier;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 public class LaunchModel implements ParentAware, ExecutableModel {
 
@@ -62,14 +59,14 @@ public class LaunchModel implements ParentAware, ExecutableModel {
         if(config == null || !config.isSet()) {
             throw new IllegalStateException("RP credentials aren't set or incomplete for Launch: " + toString());
         }
-        launch = LaunchUtils.startLaunch(config, getComposedName(), upstreamJobModel.getComposedDescription(description), upstreamJobModel.processTags(tags));
+        launch = Context.launchUtils().startLaunch(config, getComposedName(), upstreamJobModel.getComposedDescription(description), upstreamJobModel.processTags(tags));
         upstreamJobModel.start();
 
     }
 
     public void finish() {
         getUpstreamJobModel().finish();
-        LaunchUtils.finishLaunch(launch);
+        Context.launchUtils().finishLaunch(launch);
     }
 
     public Launch getLaunch() {

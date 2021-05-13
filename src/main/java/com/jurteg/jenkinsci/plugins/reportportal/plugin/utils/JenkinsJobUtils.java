@@ -11,7 +11,7 @@ public class JenkinsJobUtils {
 
     public static List<String> getJenkinsJobNamesList() {
         List<String> jobNamesList = new ArrayList<>();
-        jobNamesList.addAll(Jenkins.getInstance().getJobNames());
+        jobNamesList.addAll(Jenkins.get().getJobNames());
         return jobNamesList;
     }
 
@@ -27,7 +27,7 @@ public class JenkinsJobUtils {
     }
 
     private static Item getJobByName(String name) {
-        return Jenkins.getInstance().getItem(name);
+        return Jenkins.get().getItem(name);
     }
 
 }

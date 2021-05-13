@@ -97,7 +97,7 @@ public class UpStreamJobView extends AbstractDescribableImpl<UpStreamJobView> im
 
         @Override
         public String getDisplayName() {
-            return ">>>>>>>>";
+            return "New Upstream Job View";
         }
 
         public FormValidation doCheckJobToReportTitle(@QueryParameter String jobToReportTitle) {

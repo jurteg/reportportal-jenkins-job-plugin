@@ -7,6 +7,8 @@ import hudson.util.FormValidation;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
+import javax.annotation.Nonnull;
+
 public class LaunchView extends AbstractDescribableImpl<LaunchView> {
 
     private String launchName;
@@ -73,9 +75,10 @@ public class LaunchView extends AbstractDescribableImpl<LaunchView> {
     @Extension
     public static class DescriptorImpl extends Descriptor<LaunchView> {
 
+        @Nonnull
         @Override
         public String getDisplayName() {
-            return ">>>>>>>>";
+            return "New Launch View";
         }
 
         public FormValidation doCheckLaunchName(@QueryParameter String launchName) {

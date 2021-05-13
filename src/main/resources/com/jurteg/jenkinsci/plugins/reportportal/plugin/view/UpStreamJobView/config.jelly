@@ -26,7 +26,7 @@
     </f:section>
     <f:block>
         <f:entry>
-            <f:repeatableHeteroProperty addCaption="Add child job under Multi job" field="downStreamJobView"/>
+            <f:repeatableHeteroProperty addCaption="Add" field="downStreamJobView"/>
         </f:entry>
     </f:block>
 

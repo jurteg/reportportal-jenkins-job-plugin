@@ -14,7 +14,7 @@ import java.util.List;
 public class UiUtils {
 
     public static ReportPortalPlugin getPlugin() {
-        List<Action> actions = Jenkins.getInstance().getActions();
+        List<Action> actions = Jenkins.get().getActions();
         for(Action action : actions) {
             if(action instanceof ReportPortalPlugin) {
                 return (ReportPortalPlugin)action;
@@ -75,9 +75,11 @@ public class UiUtils {
     public static List<String> getJenkinsJobChildrenNames(String parentJobName) {
         List<String> jobNamesList = new ArrayList<>();
         if (!parentJobName.trim().isEmpty()) {
-            for (Item jenkinsJob : Jenkins.getInstance().getItem(parentJobName).getAllJobs()) {
-                if (!jenkinsJob.getName().equals(parentJobName)) {
-                    jobNamesList.add(jenkinsJob.getName());
+            if (Jenkins.get().getItem(parentJobName) != null) {
+                for (Item jenkinsJob : Jenkins.get().getItem(parentJobName).getAllJobs()) {
+                    if (!jenkinsJob.getName().equals(parentJobName)) {
+                        jobNamesList.add(jenkinsJob.getName());
+                    }
                 }
             }
         }

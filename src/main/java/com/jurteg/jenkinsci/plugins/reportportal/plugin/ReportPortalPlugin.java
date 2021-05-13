@@ -31,7 +31,7 @@ public final class ReportPortalPlugin extends AbstractDescribableImpl<ReportPort
     private final static String PROPERTY_FILE_PATH = "/properties.properties";
 
     public XmlFile getConfigFile() {
-        return new XmlFile(new File(Jenkins.getInstance().getRootDir(), CONFIG_FILE));
+        return new XmlFile(new File(Jenkins.get().getRootDir(), CONFIG_FILE));
     }
 
     public ReportPortalPlugin() throws IOException {
@@ -42,8 +42,8 @@ public final class ReportPortalPlugin extends AbstractDescribableImpl<ReportPort
         version = getVersion();
     }
 
-    public HttpResponse doConfigSubmit(StaplerRequest req) throws ServletException, IOException {
-        Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
+    public HttpResponse doConfigSubmit(StaplerRequest req) throws IOException, ServletException {
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
         generalView = null; // otherwise bindJSON will never clear it once set
         req.bindJSON(this, req.getSubmittedForm());
         getConfigFile().write(this);

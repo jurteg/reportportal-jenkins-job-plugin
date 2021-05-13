@@ -12,7 +12,8 @@
             <f:form action="configSubmit" name="generalView" method="post">
                 <j:set var="instance" value="${it}"/>
                 <j:set var="descriptor" value="${it.descriptor}"/>
-                <f:optionalProperty field="generalView" title="Enable Reporting"/>
+                <f:property field="generalView"/>
+<!--                <f:optionalProperty field="generalView" title="Enable Reporting"/>-->
                 <f:bottomButtonBar>
                     <f:submit value="${%Save}"/>
                     <f:apply/>

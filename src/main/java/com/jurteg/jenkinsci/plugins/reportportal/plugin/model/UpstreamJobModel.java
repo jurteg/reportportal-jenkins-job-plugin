@@ -1,10 +1,11 @@
 package com.jurteg.jenkinsci.plugins.reportportal.plugin.model;
 
-import com.jurteg.jenkinsci.plugins.reportportal.plugin.utils.LaunchUtils;
+import com.jurteg.jenkinsci.plugins.reportportal.Context;
 import com.jurteg.jenkinsci.plugins.reportportal.plugin.view.UpStreamJobView;
 import hudson.model.Run;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class UpstreamJobModel extends AbstractJobModel {
 
@@ -42,7 +43,7 @@ public class UpstreamJobModel extends AbstractJobModel {
         if (((LaunchModel) getParent()).getLaunch() == null) {
             throw new IllegalStateException(String.format("Unable to run RP item for job model '%s' because parent item '%s' is not running.", toString(), parent.toString()));
         }
-        rpTestItemId = LaunchUtils.startTestItem(((LaunchModel) parent).getLaunch(), null, getComposedName(), getComposedDescription(description), processTags(tags), getTestItemType());
+        rpTestItemId = Context.launchUtils().startTestItem(((LaunchModel) parent).getLaunch(), null, getComposedName(), getComposedDescription(description), processTags(tags), getTestItemType(), Optional.of(run.getFullDisplayName()));
         startLogItem();
     }
 

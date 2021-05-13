@@ -1,23 +1,29 @@
 package com.jurteg.jenkinsci.plugins.reportportal.plugin.model;
 
 import com.epam.reportportal.service.Launch;
-import com.jurteg.jenkinsci.plugins.reportportal.plugin.utils.LaunchUtils;
+import com.epam.ta.reportportal.ws.model.attribute.ItemAttributesRQ;
+import com.google.common.collect.Sets;
+import com.jurteg.jenkinsci.plugins.reportportal.Context;
 import com.jurteg.jenkinsci.plugins.reportportal.runtimeutils.JobNamingUtils;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import io.reactivex.Maybe;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class AbstractJobModel implements JobModel, Cloneable {
 
     private static final String SEMICOLON = ";";
     private static final String SPACE = " ";
+    private static final String STEP = "STEP";
     protected List<String> nameAttributesList = new ArrayList<>();
 
     protected String jobName;
@@ -46,7 +52,9 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
 
     protected void startLogItem() {
         String name = "Console Log";
-        jobLogItemId = LaunchUtils.startTestItem(getLaunchModel().getLaunch(), rpTestItemId, name, name, null, "STEP");
+        Set<ItemAttributesRQ> attributes = new HashSet<>();
+        attributes.add(new ItemAttributesRQ(null, name, false));
+        jobLogItemId = Context.launchUtils().startTestItem(getLaunchModel().getLaunch(), rpTestItemId, name, name, attributes, STEP, Optional.of(run.getFullDisplayName()));
     }
 
     @Override
@@ -62,8 +70,8 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
     @Override
     public void finish() {
         Launch rpLaunch = getLaunchModel().getLaunch();
-        LaunchUtils.finishTestItem(rpLaunch, jobLogItemId, run);
-        LaunchUtils.finishTestItem(rpLaunch, rpTestItemId, run, false);
+        Context.launchUtils().finishTestItem(rpLaunch, jobLogItemId, run);
+        Context.launchUtils().finishTestItem(rpLaunch, rpTestItemId, run, false);
     }
 
     @Override
@@ -230,14 +238,18 @@ public abstract class AbstractJobModel implements JobModel, Cloneable {
         return newModel;
     }
 
-    protected Set<String> processTags(String delimitedString) {
+    protected Set<ItemAttributesRQ> processTags(String delimitedString) {
         Set<String> tags = new HashSet<>();
         if (delimitedString != null) {
-            for (String tag : delimitedString.split(SEMICOLON)) {
-                tags.add(JobNamingUtils.processEnvironmentVariables(run, tag));
+            if (StringUtils.isNotEmpty(delimitedString)) {
+                for (String tag : delimitedString.split(SEMICOLON)) {
+                    tags.add(JobNamingUtils.processEnvironmentVariables(run, tag));
+                }
+            } else {
+                tags.addAll(Arrays.asList(jobName.split(SPACE)));
             }
         }
-        return tags;
+        return Sets.newHashSet(tags.stream().map(tag -> new ItemAttributesRQ(null, tag, false)).collect(Collectors.toList()));
     }
 
 }
